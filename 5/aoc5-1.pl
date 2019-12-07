@@ -1,6 +1,10 @@
 #!/bin/env perl
 # Copyright Christer Boräng (mort@chalmers.se) 2010
 
+# This is an earlier version of what is in 7/aoc7.pl
+# before the refactorisation
+
+
 # Always use strict and warnings
 use strict;
 use warnings;
