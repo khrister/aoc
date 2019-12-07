@@ -207,6 +207,7 @@ sub equals
     return $pos + 4;
 }
 
+# fetch data from $addr or what $addr points at
 sub fetch()
 {
     my $addr = shift;
@@ -221,6 +222,7 @@ sub fetch()
     }
 }
 
+# Debug function
 sub D
 {
     my $str = shift;
@@ -269,6 +271,6 @@ Written by Christer Boräng (mort@chalmers.se)
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright Christer Boräng 2011
+Copyright Christer Boräng 2019
 
 =cut
