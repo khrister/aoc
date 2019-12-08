@@ -4,6 +4,7 @@
 # Always use strict and warnings
 use strict;
 use warnings;
+no warnings 'recursion';
 
 # Other modules
 use Data::Dumper;
@@ -32,7 +33,7 @@ while (my $line = <>)
     }
 }
 
-D(\%childs_of);
+#D(\%childs_of);
 
 my $tree = Tree::Simple->new("COM", Tree::Simple->ROOT);
 

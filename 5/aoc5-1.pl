@@ -100,8 +100,8 @@ sub do_op
     }
     elsif ($op == 99)
     {
-        D(\@prog);
-        exit_prog();
+        #        D(\@prog);
+        exit();
     }
     elsif ($op =~ /^\d\d\d+$/)
     {
