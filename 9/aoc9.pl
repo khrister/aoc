@@ -49,8 +49,6 @@ sub run_program
     my $pos = 0;
     while (1)
     {
- #       print "run_program: pos $pos\n";
- #       D(\@prog);
         $pos = do_op($pos, $prog[$pos]);
     }
 }
@@ -64,8 +62,6 @@ sub do_op
     die("pos not in prog anymore")
         if ($pos > scalar @prog);
 
-    #    D(\@prog);
-    # print STDERR $op . "\n";
     if ($func_op{$op})
     {
         $pos = $func_op{$op}($pos, $modes);
@@ -95,16 +91,7 @@ sub add
     $val1 = fetch($pos + 1, substr($modes, -1));
     $val2 = fetch($pos + 2, substr($modes, -2, 1));
     writemem($pos + 3, substr($modes, -3, 1), $val1 + $val2);
-#    my $mode = substr($modes, -3, 1);
-#    if (!$mode)
-#    {
-#        $addr = $prog[$pos + 3];
-#    }
-#    elsif ($mode == 2)
-#    {
-#        $addr = $prog[$pos + 3] + $relbase;
-#    }
-#    $prog[$addr] = $val1 + $val2;
+
     return $pos + 4;
 }
 
@@ -118,16 +105,7 @@ sub multiply
     $val1 = fetch($pos + 1, substr($modes, -1));
     $val2 = fetch($pos + 2, substr($modes, -2, 1));
     writemem($pos + 3, substr($modes, -3, 1), $val1 * $val2);
-#    my $mode = substr($modes, -3, 1);
-#    if (!$mode)
-#    {
-#        $addr = $prog[$pos + 3];
-#    }
-#    elsif ($mode == 2)
-#    {
-#        $addr = $prog[$pos + 3] + $relbase;
-#    }
-#    $prog[$addr] = $val1 * $val2;
+
     return $pos + 4;
 }
 
@@ -142,15 +120,7 @@ sub input
     my $val = prompt('-iv', "");
 
     writemem($pos + 1, $modes, $val);
-#    if ($modes == 0)
-#    {
-#        $prog[$addr] = $val;
-#    }
-#    elsif ($modes == 2)
-#    {
-#        $prog[$addr + $relbase] = $val;
-#    }
-#    print STDERR "Input received: $val\n";
+
     return $pos + 2;
 }
 
@@ -214,17 +184,6 @@ sub less_than
     }
 
     writemem($pos + 3, substr($modes, -3, 1), $res);
-#    my $mode = substr($modes, -3, 1);
-#    if (!$mode)
-#    {
-#        $addr = $prog[$pos + 3];
-#    }
-#    elsif ($mode == 2)
-#    {
-#        $addr = $prog[$pos + 3] + $relbase;
-#    }
-#
-#    $prog[$addr] = $res;
 
     return $pos + 4;
 }
@@ -248,17 +207,6 @@ sub equals
     }
 
     writemem($pos + 3, substr($modes, -3, 1), $res);
-#    my $mode = substr($modes, -3, 1);
-#    if (!$mode)
-#    {
-#        $addr = $prog[$pos + 3];
-#    }
-#    elsif ($mode == 2)
-#    {
-#        $addr = $prog[$pos + 3] + $relbase;
-#    }
-#
-#    $prog[$addr] = $res;
 
     return $pos + 4;
 }
@@ -271,7 +219,7 @@ sub movebase
     $val = fetch($pos + 1, substr($modes, -1));
 
     $relbase += $val;
-#    print "relbase: $relbase\n";
+
     return $pos + 2;
 }
 
