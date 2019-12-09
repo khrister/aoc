@@ -8,7 +8,7 @@ use warnings;
 # Other modules
 use Data::Dumper;
 use IO::Prompter;
-use POSIX qw/floor ceil/;
+#use POSIX qw/floor ceil/;
 use IO::Handle;
 
 # Global variables
@@ -59,14 +59,14 @@ sub do_op
     my $op = shift;
     my $modes = shift || 0;
 
-    die("pos not in prog anymore")
-        if ($pos > scalar @prog);
+#    die("pos not in prog anymore")
+#        if ($pos > scalar @prog);
 
     if ($func_op{$op})
     {
         $pos = $func_op{$op}($pos, $modes);
     }
-    elsif ($op =~ /^\d\d\d+$/)
+    elsif ($op > 99)
     {
         my $lop = $op % 100;
         my $mode = substr($op, 0, -2);
@@ -216,7 +216,7 @@ sub movebase
     my $pos = shift;
     my $modes = shift;
     my $val;
-    $val = fetch($pos + 1, substr($modes, -1));
+    $val = fetch($pos + 1, $modes);
 
     $relbase += $val;
 
@@ -246,13 +246,14 @@ sub writemem
 # fetch data from $addr or what $addr points at
 sub fetch()
 {
-    my $addr = shift;
+    my $cell = shift;
     my $mode = shift;
+    my $addr = $prog[$cell];
 
     # If mode is 0, fetch from what $addr points to
     if ($mode == 0)
     {
-        my $ret = $prog[$prog[$addr]];
+        my $ret = $prog[$addr];
         $ret = 0 if (!defined($ret));
         return $ret;
 
@@ -260,14 +261,13 @@ sub fetch()
     # If mode is 1, fetch from $addr directly
     elsif ($mode == 1)
     {
-        my $ret = $prog[$addr];
-        $ret = 0 if (!defined($ret));
-        return $ret;
+        $addr = 0 if (!defined($addr));
+        return $addr;
     }
     # If mode is 2, fetch from what $addr + $relbase points to
     elsif ($mode == 2)
     {
-        my $ret = $prog[$prog[$addr] + $relbase];
+        my $ret = $prog[$addr + $relbase];
         $ret = 0 if (!defined($ret));
         return $ret;
     }
