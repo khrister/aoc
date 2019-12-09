@@ -231,10 +231,12 @@ sub writemem
     my $val = shift;
     my $addr = $prog[$cell];
 
+    # If mode is 0, write to $addr
     if (!$mode)
     {
         $prog[$addr] = $val;
     }
+    # If mode is 2, write to $addr + $relbase
     elsif($mode == 2)
     {
         $prog[$addr + $relbase] = $val;
@@ -246,6 +248,8 @@ sub fetch()
 {
     my $addr = shift;
     my $mode = shift;
+
+    # If mode is 0, fetch from what $addr points to
     if ($mode == 0)
     {
         my $ret = $prog[$prog[$addr]];
@@ -253,12 +257,14 @@ sub fetch()
         return $ret;
 
     }
+    # If mode is 1, fetch from $addr directly
     elsif ($mode == 1)
     {
         my $ret = $prog[$addr];
         $ret = 0 if (!defined($ret));
         return $ret;
     }
+    # If mode is 2, fetch from what $addr + $relbase points to
     elsif ($mode == 2)
     {
         my $ret = $prog[$prog[$addr] + $relbase];
