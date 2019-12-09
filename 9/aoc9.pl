@@ -239,7 +239,6 @@ sub writemem
     {
         $prog[$addr + $relbase] = $val;
     }
-#    print "$addr, $mode, $val\n";
 }
 
 # fetch data from $addr or what $addr points at
