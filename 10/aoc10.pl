@@ -65,6 +65,7 @@ foreach my $p (keys %can_see)
         $pos = $p;
     }
 }
+print "Best place: $pos ($max visible)\n";
 
 while (1)
 {
@@ -167,8 +168,8 @@ sub calc_visible
                     }
                     next TRY;
                 }
-                #            next TRY
-                #                if ($ydiff < 0);
+                            next TRY
+                                if ($ydiff < 0);
 
                 my $xdelta = $xdiff / $gcd;
                 my $ydelta = $ydiff / $gcd;
