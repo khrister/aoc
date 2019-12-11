@@ -16,19 +16,19 @@ my %col_grid = ();
 my %painted = ();
 my $pos = "0,0";
 my $dir = "U";
+$SIG{PIPE} = "IGNORE";
 
 my $file = shift @ARGV;
 
 
 @cmd = ('./intcode.pl', $file);
 
-
 # Starting panel is black
-$in = 0;
+$in = "0\n";
 # Start running the intcode computer
 $robot = start (\@cmd, \$in, \$out);
 # And feed the first input
-$robot->pump();
+#$robot->pump();
 
 DONE:
 while (1)
@@ -36,18 +36,62 @@ while (1)
     my $col;
     my $turn;
 
-    eval { $robot->pump() until ($out or !$robot->pumpable); };
+    # Get color to paint
+    # Wait for output to be two digits
+    eval { $robot->pump() until ($out =~ /\d\n\d/ or !$robot->pumpable); };
     last DONE
         unless ($out);
     chomp $out;
-    ($col, $turn) = split(/,/, $out);
 
-    $painted{$out} = 1;
-    $col_grid{$out} = $col;
+    ($col,$turn) = split(/\n/, $out);
+    $out = "";
+
+    $painted{$pos} = 1;
+    $col_grid{$pos} = $col;
     $dir = turn($dir, $turn);
+    $pos = move($dir, $pos);
+    $in = ($col_grid{$pos} || 0) . "\n";
 }
+
+print "Painted " . (scalar (keys %painted)) . "\n";
+
 eval { $robot->finish() };
 
+
+sub fetch
+{
+
+}
+
+sub move
+{
+    my $d = shift;
+    my $p = shift;
+    my $x;
+    my $y;
+    ($x, $y) = split(/,/, $p);
+    if ($d eq "U")
+    {
+        $y++;
+    }
+    elsif ($d eq "R")
+    {
+        $x++;
+    }
+    elsif ($d eq "D")
+    {
+        $y--;
+    }
+    elsif ($d eq "L")
+    {
+        $x--;
+    }
+    else
+    {
+        print "Broken direction $d\n";
+    }
+    return "$x,$y";
+}
 
 sub turn
 {
