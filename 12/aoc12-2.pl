@@ -8,7 +8,6 @@ use Data::Dumper;
 
 # Other modules
 use Algorithm::Combinatorics qw(combinations);
-use List::MoreUtils qw (first_index);
 use Math::Prime::Util::GMP qw(lcm);
 
 # Global variables
@@ -33,7 +32,7 @@ open($fh, '<', $file)
     }
 }
 
-
+# Get a string for the start position to compare to later
 foreach my $axis (0..2)
 {
     # Construct a string with the coords
@@ -45,19 +44,17 @@ foreach my $axis (0..2)
     $origstrs[$axis] = $str;
 }
 
+my @pairs = combinations([ qw(0 1 2 3) ], 2);
+
 my $steps;
 while (1)
 {
-
+    # We're done if all axes has found a cycle
     last
         if ($done[0] and $done[1] and $done[2]);
 
     # First change velocities
-
-    my $m = [ qw(0 1 2 3) ];
-    my $iter = combinations($m, 2);
-    # Iterate over all pairs of moons
-    while (my $pair = $iter->next())
+    foreach my $pair (@pairs)
     {
         my $m1 = $pair->[0];
         my $m2 = $pair->[1];
@@ -92,6 +89,7 @@ while (1)
     }
     $steps++;
 
+    # Construct stringvalue of x, y and z potision, and compare to start
     foreach my $axis (0..2)
     {
         next if ($done[$axis]);
@@ -112,6 +110,7 @@ while (1)
 }
 
 my $totcycles = 1;
+# Calculate the least common multiple for x, y and z
 foreach my $elem (@cycles)
 {
     $totcycles = lcm($totcycles, $elem);
