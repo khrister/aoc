@@ -28,11 +28,15 @@ my %goods = ();
 }
 
 
+# Iterate the start value, zeroing in on the one that is closest to 1 trillion
+# but not above
 {
-    my $num = 843671;
-    my $above = 1000000000000;
-    my $below = 0;
+    my $num = 843671;     # Original guess, 1 trillion divided by ore needed
+                          # to make 1 fuel
+    my $above = 1000000000000; # We definitely won't make 1 trillion fuel
+    my $below = 0;             # And we will make more than 0, hopefully...
     my $i;
+
     while (1)
     {
         $i++;
