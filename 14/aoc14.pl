@@ -15,11 +15,6 @@ use Data::Dumper;
 # %goods = ( mat_a => [ 4, mat_b, 10, mat_c, 12, mat_d, 4 ] )
 my %goods = ();
 
-my $ore_used = 0;
-
-my %spares = ();
-
-
 {
     my $fh;
     my $file = shift @ARGV;
@@ -32,14 +27,22 @@ my %spares = ();
     close $fh;
 }
 
-produce("FUEL", 1);
-print "$ore_used\n";
+my $a = run(1);
+print "$a\n";
+
+sub run
+{
+    my $n = shift;
+    my %spares = ();
+    return produce("FUEL", $n, \%spares);
+}
 
 sub produce
 {
-    my $result = 0;
     my $mat = shift;
     my $amount = shift;
+    my $spare_ref = shift;
+    my $result = 0;
 
     if (!$goods{$mat})
     {
@@ -52,16 +55,17 @@ sub produce
     # How many do we need compares to how many we make per production
     my $multi = int($amount / $made);
     my $remain = $amount % $made;
+
     if ($remain)
     {
         $multi++;
-        if ($spares{$mat})
+        if ($spare_ref->{$mat})
         {
-            $spares{$mat} += ($made - $remain);
+            $spare_ref->{$mat} += ($made - $remain);
         }
         else
         {
-            $spares{$mat} = ($made - $remain);
+            $spare_ref->{$mat} = ($made - $remain);
         }
     }
 
@@ -74,22 +78,22 @@ sub produce
         # If it's ORE
         if ($nmat eq "ORE")
         {
-            $ore_used += $namount * $multi;
-            return $namount;
+            return $namount * $multi;
         }
 
-        if ($spares{$nmat})
+        if ($spare_ref->{$nmat})
         {
-            if ($spares{$nmat} >= $namount * $multi)
+            if ($spare_ref->{$nmat} >= $namount * $multi)
             {
-                $spares{$nmat} -= $namount * $multi;
+                $spare_ref->{$nmat} -= $namount * $multi;
                 next;
             }
-            $spare = $spares{$nmat};
-            $spares{$nmat} = 0;
+            $spare = $spare_ref->{$nmat};
+            $spare_ref->{$nmat} = 0;
         }
-        my $tmp = produce($nmat, $namount * $multi - $spare);
+        $result += produce($nmat, $namount * $multi - $spare, $spare_ref);
     }
+    return $result;
 }
 
 sub parseline
