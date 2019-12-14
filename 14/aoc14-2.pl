@@ -17,9 +17,6 @@ my %goods = ();
 
 my $ore_used = 0;
 
-my %spares = ();
-
-
 {
     my $fh;
     my $file = shift @ARGV;
@@ -41,7 +38,7 @@ my %spares = ();
     while (1)
     {
         $i++;
-        if (test($num) > 1000000000000)
+        if (run($num) > 1000000000000)
         {
             $above = $num;
         }
@@ -59,19 +56,21 @@ my %spares = ();
     }
 }
 
-sub test
+
+sub run
 {
     my $n = shift;
-    my $r = produce("FUEL", $n);
-    %spares = ();
-    return $r;
+    my %spares = ();
+    return produce("FUEL", $n, \%spares);
 }
 
 sub produce
 {
     my $mat = shift;
     my $amount = shift;
+    my $spare_ref = shift;
     my $result = 0;
+
     if (!$goods{$mat})
     {
         print "No material $mat found\n";
@@ -86,13 +85,13 @@ sub produce
     if ($remain)
     {
         $multi++;
-        if ($spares{$mat})
+        if ($spare_ref->{$mat})
         {
-            $spares{$mat} += ($made - $remain);
+            $spare_ref->{$mat} += ($made - $remain);
         }
         else
         {
-            $spares{$mat} = ($made - $remain);
+            $spare_ref->{$mat} = ($made - $remain);
         }
     }
 
@@ -108,15 +107,15 @@ sub produce
             return $namount * $multi;
         }
 
-        if ($spares{$nmat})
+        if ($spare_ref->{$nmat})
         {
-            if ($spares{$nmat} >= $namount * $multi)
+            if ($spare_ref->{$nmat} >= $namount * $multi)
             {
-                $spares{$nmat} -= $namount * $multi;
+                $spare_ref->{$nmat} -= $namount * $multi;
                 next;
             }
-            $spare = $spares{$nmat};
-            $spares{$nmat} = 0;
+            $spare = $spare_ref->{$nmat};
+            $spare_ref->{$nmat} = 0;
         }
         $result += produce($nmat, $namount * $multi - $spare);
     }
