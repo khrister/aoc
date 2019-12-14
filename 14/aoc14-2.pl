@@ -15,8 +15,6 @@ use Data::Dumper;
 # %goods = ( mat_a => [ 4, mat_b, 10, mat_c, 12, mat_d, 4 ] )
 my %goods = ();
 
-my $ore_used = 0;
-
 {
     my $fh;
     my $file = shift @ARGV;
@@ -117,7 +115,7 @@ sub produce
             $spare = $spare_ref->{$nmat};
             $spare_ref->{$nmat} = 0;
         }
-        $result += produce($nmat, $namount * $multi - $spare);
+        $result += produce($nmat, $namount * $multi - $spare, $spare_ref);
     }
     return $result;
 }
