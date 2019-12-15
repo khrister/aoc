@@ -31,7 +31,8 @@ my %goods = ();
 # Iterate the start value, zeroing in on the one that is closest to 1 trillion
 # but not above
 {
-    my $num = 843671;     # Original guess, 1 trillion divided by ore needed
+    my $goal = 1000000000000;
+    my $num = 865467;     # Original guess, 1 trillion divided by ore needed
                           # to make 1 fuel
     my $above = 1000000000000; # We definitely won't make 1 trillion fuel
     my $below = 0;             # And we will make more than 0, hopefully...
@@ -40,13 +41,16 @@ my %goods = ();
     while (1)
     {
         $i++;
-        if (run($num) > 1000000000000)
+        my $used = run($num);
+        if ($used > $goal)
         {
-            $above = $num;
+            my $div = $used / $goal;
+            $above = int($num / $div) + 1;
         }
         else
         {
-            $below = $num;
+            my $mul = $goal / $used;
+            $below = int($num * $mul);
         }
         $num = int(($above - $below) / 2) + $below;
         if (($above - $below) eq 1)
@@ -79,7 +83,7 @@ sub produce
         exit;
     }
     my @arr = @{$goods{$mat}};
-    my $made = shift @arr;
+    my $made = pop @arr;
 
     # How many do we need compares to how many we make per production
     my $multi = int($amount / $made);
@@ -100,8 +104,8 @@ sub produce
     # Make the sub parts
     while (@arr)
     {
-        my $nmat = shift @arr;
-        my $namount = shift @arr;
+        my $namount = pop @arr;
+        my $nmat = pop @arr;
         my $spare = 0;
         # If it's ORE
         if ($nmat eq "ORE")
@@ -109,8 +113,11 @@ sub produce
             return $namount * $multi;
         }
 
+        # Check if we have spare materials
         if ($spare_ref->{$nmat})
         {
+            # If we have enough, just go on to the next material
+            # and remove the used material from storage
             if ($spare_ref->{$nmat} >= $namount * $multi)
             {
                 $spare_ref->{$nmat} -= $namount * $multi;
@@ -119,6 +126,7 @@ sub produce
             $spare = $spare_ref->{$nmat};
             $spare_ref->{$nmat} = 0;
         }
+        # And produce more
         $result += produce($nmat, $namount * $multi - $spare, $spare_ref);
     }
     return $result;
@@ -132,7 +140,6 @@ sub parseline
 
     my ($a, $b) = split(/ => /, $line);
     my ($amount, $mat) = split(/ /, $b);
-    $lneeds[0] = $amount;
 
     do
     {
@@ -141,6 +148,7 @@ sub parseline
         ($namount, $n, $a) = split(/,? /, $a, 3);
         push(@lneeds, ($n, $namount));
     } while ($a and $a =~ / /);
+    push(@lneeds, $amount);
 
     $goods{$mat} = \@lneeds;
 }
