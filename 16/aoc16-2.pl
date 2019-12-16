@@ -37,17 +37,19 @@ print "offset $offset\n";
 
 @input = @input[$offset..$length-1];
 
+my @looplist = reverse ($offset..($length -1));
+
 foreach my $p (0..($max-1))
 {
     @output = ();
     my $res = 0;
 #    print join("", @input[0..7]) . "\n";;
-    foreach my $digit (reverse ($offset..($length - 1)))
+    foreach my $digit (@looplist)
     {
         $res += $input[$digit - $offset];
 #        print "res = $res, digit = $digit\n";
 #        sleep $p;
-        push(@output, substr($res, -1));
+        push(@output, $res % 10);
     }
     @input = reverse @output;
 #    print "Done $p phases, length = " . scalar @output . "\n";
