@@ -5,6 +5,7 @@
 use strict;
 use warnings;
 use Data::Dumper;
+use List::MoreUtils qw( pairwise );
 
 # Other modules
 
@@ -14,48 +15,73 @@ my @output;
 my @phases;
 my @origphase = (0, 1, 0, -1);
 my $length;
+my $max;
+
 
 {
     my $fh;
     my $file = shift @ARGV;
+    $max = shift @ARGV;
+    chomp $max;
     open($fh, '<', $file)
         or die("Could not open $file: ");
     my $line = <$fh>;
     chomp $line;
     @input = split(//, $line);
     $length = length $line;
-    @phases = calc_phases($length);
+    @phases = calc_phases($max);
     close $fh;
 }
 
-foreach my $i (0..$length)
+
+#D(\@phases);
+
+foreach my $p (0..($max-1))
 {
-    @input = @output;
     @output = ();
-    foreach my $j (0..$length)
+    #D(\@input);
+    foreach my $d (0..$length-1)
     {
-        $output[$j] = $input[$j] * $phases[$i]->[$j];
+        my $res = 0;
+        my @phase = @{$phases[$d]};
+        my $len = scalar(@phase);
+    I:
+        foreach my $i (0..$length-1)
+        {
+            next I unless ($phase[$i % $len]);
+            $res += $input[$i] * $phase[$i % $len];
+        }
+        $res = substr($res, -1);
+        push(@output, $res);
     }
+    #D(\@output);
+    @input = @output;
 }
 
-print join ("", @output) . "\n";
+print substr(join ("", @output), 0, 8) . "\n";
 
 sub
 calc_phases
 {
     my $max = shift;
     my @res = ();
+
+    if ($max < $length)
+    {
+        $max = $length;
+    }
     # 0 until max gives one more than max elements, but one will be removed
     foreach my $phnum (0..($max-1))
     {
         my @phase = ();
+        my $len = 4 * $phnum + 4;
     DIGIT:
-        foreach my $digit (0..$max)
+        foreach my $digit (0..$len)
         {
             foreach my $t (0..$phnum)
             {
                 push(@phase, $origphase[$digit % 4]);
-                last DIGIT if (scalar @phase > $max);
+                last DIGIT if (scalar @phase > $len);
             }
         }
         shift @phase;
