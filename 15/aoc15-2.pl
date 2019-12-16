@@ -74,6 +74,8 @@ sub flood2
 
     $gdist{"$x,$y"} = $dist++;
 
+    #paint(\%gdist, 0) if (! ($dist % 20));
+
     my $west = ($x - 1) . ",$y";
     my $east = ($x + 1) . ",$y";
     my $north = "$x," . ($y + 1);
@@ -119,7 +121,7 @@ sub flood
         }
         return;
     }
-
+#    paint(\%grid, 1) if (! ($dist % 20));
     $gdist{"$x,$y"} = $dist++;
 
     my $west = ($x - 1) . ",$y";
