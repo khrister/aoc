@@ -41,10 +41,11 @@ $robot = start (\@cmd, \$in, \$out);
     push(@input, encode($c));
     push(@input, encode("n"));
 
-D(\@input);
+    # D(\@input);
     my $result = enter(@input);
 
-    print "dust = $result\n";
+    $result =~ s/\b\d\d\n//g;
+    print "dust = $result";
 
 }
 
@@ -57,13 +58,13 @@ sub enter
     my @cmds = @_;
     foreach my $cmd (@cmds)
     {
-        print "Entering command $cmd\n";
-        $out = "";
+        #print "Entering command $cmd\n";
         $in = "$cmd\n";
         $robot->pump() until ( $out =~ /input:/ or !$robot->pumpable);
         #print $out;
+        $out = "";
     }
-    $robot->pump() until ( $out =~ /input:/ or !$robot->pumpable); 
+    $robot->pump() until ( !$robot->pumpable);
     return $out;
 }
 
