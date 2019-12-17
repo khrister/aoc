@@ -249,20 +249,20 @@ use Class::Std;
         if (!$mode)
         {
             my $ret = $prog_of{ident $self}->[$addr];
-            $ret = 0 if (!defined($ret));
+            $ret = 0 if (!defined($ret) or !$ret);
             return $ret;
         }
         # If mode is 1, fetch from $addr directly
         elsif ($mode == 1)
         {
-            $addr = 0 if (!defined($addr));
+            $addr = 0 if (!defined($addr) or !$addr);
             return $addr;
         }
         # If mode is 2, fetch from what $addr + $relbase points to
         elsif ($mode == 2)
         {
             my $ret = $prog_of{ident $self}->[$addr + $relbase{ident $self}];
-            $ret = 0 if (!defined($ret));
+            $ret = 0 if (!defined($ret) or !$ret);
             return $ret;
         }
     }
