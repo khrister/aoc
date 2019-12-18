@@ -63,7 +63,7 @@ sub parse
             next ROW;
         }
 #        print "$row,$col\n";
-        $grid{"$row,$col"} = $cmd;
+        $grid{"$col,$row"} = $cmd;
         $col++
     }
 }
