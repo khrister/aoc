@@ -17,7 +17,7 @@ my $start = "";
 
 {
     my $file = shift @ARGV;
-    open(my $fh, '<', $file);
+    open(my $fh, '<', $file) or die "Can't open file $file";
     my $x = 0;
     my $y = 0;
 
