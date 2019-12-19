@@ -10,6 +10,8 @@ use List::Util 'max';
 
 my %grid = ("0,0" => 1);
 my %gdist = ();
+my %keys = ();
+my %locks = (),
 
 my $start = "";
 
@@ -31,6 +33,14 @@ my $start = "";
             {
                 $start = "$x,$y";
             }
+            if ($p =~ /[a-z]/)
+            {
+                $keys{$p} = "$x,$y";
+            }
+            if ($p =~ /[A-Z]/)
+            {
+                $locks{$p} = "$x,$y";
+            }
             $x++;
         }
         $y++;
@@ -46,6 +56,9 @@ paint (\%gdist);
 #D(\%gdist);
 
 print "$start\n";
+
+D(\%keys);
+D(\%locks);
 
 sub flood2
 {
