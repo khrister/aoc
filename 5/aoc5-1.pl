@@ -1,5 +1,5 @@
 #!/bin/env perl
-# Copyright Christer Boräng (mort@chalmers.se) 2010
+# Copyright Christer Boräng (mort@chalmers.se) 2019
 
 # This is an earlier version of what is in 7/aoc7.pl
 # before the refactorisation
@@ -393,6 +393,6 @@ Written by Christer Boräng (mort@chalmers.se)
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright Christer Boräng 2011
+Copyright Christer Boräng 2019
 
 =cut
