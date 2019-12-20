@@ -134,7 +134,7 @@ sub flood2
         return;
     }
 
-    if ($level > $maxdepth)
+    if ($level > $maxdepth or $dist > 10000)
     {
         return;
     }
