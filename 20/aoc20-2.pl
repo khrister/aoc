@@ -18,6 +18,7 @@ my $width = 0;
 my $start = "";
 my $goal = "";
 my $distance;
+my $maxdepth = 25;
 
 {
     my $file = shift @ARGV;
@@ -110,10 +111,13 @@ foreach my $c (keys %grid)
     }
 }
 
-paint(\%grid);
+#paint(\%grid);
 #D(\%portals);
 #print "starting flood($start,0)\n";
-flood2(split(/,/, $start),0, 0);
+while (!$distance)
+{
+    flood2(split(/,/, $start), 0, 0);
+}
 
 print "$distance\n";
 
@@ -130,7 +134,7 @@ sub flood2
         return;
     }
 
-    if ($dist > 10000)
+    if ($level > $maxdepth)
     {
         return;
     }
