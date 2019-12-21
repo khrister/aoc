@@ -1,4 +1,4 @@
-#!/bin/env perl
+#!/usr/bin/env perl
 # Copyright Christer Boräng (mort@chalmers.se) 2019
 
 # Always use strict and warnings

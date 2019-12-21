@@ -1,4 +1,4 @@
-#!/bin/env perl
+#!/usr/bin/env perl
 # Copyright Christer Boräng (mort@chalmers.se) 2019
 
 # This is an earlier version of what is in 7/aoc7.pl
