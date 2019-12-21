@@ -7,14 +7,10 @@ use strict;
 no warnings 'substr';
 
 use base qw( Exporter );
-our @EXPORT  = qw( tmpl srch );
-our @EXPORT_OK = qw( call );
 
-use base qw( JSON );
 use Class::Std;
 {
     use Data::Dumper;
-    use IO::Prompter;
     use IO::Handle;
 
     # Global variables
