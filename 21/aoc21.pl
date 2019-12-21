@@ -32,7 +32,7 @@ my @code = (
     'NOT C J', # If there's no ground at C, set J
     'OR T J',  # If T is set, set J
     'AND D J', # But only jump if there's ground at D
-    'RUN');
+    'WALK');
 
 my @inst = ();
 foreach my $l (@code)
