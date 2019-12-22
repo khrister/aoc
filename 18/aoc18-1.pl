@@ -13,6 +13,8 @@ my %gdist = ();
 my %keys = ();
 my %locks = (),
 
+my %routes = ();
+
 my $start = "";
 
 {
@@ -36,10 +38,12 @@ my $start = "";
             if ($p =~ /[a-z]/)
             {
                 $keys{$p} = "$x,$y";
+                $keys{"$x,$y"} = $p;
             }
             if ($p =~ /[A-Z]/)
             {
                 $locks{$p} = "$x,$y";
+                $locks{"$x,$y"} = $p;
             }
             $x++;
         }
@@ -49,7 +53,7 @@ my $start = "";
 
 paint(\%grid);
 
-flood2(split(/,/, $start),0);
+flood2(split(/,/, $start),0, "@");
 
 paint (\%gdist);
 
@@ -60,9 +64,11 @@ print "$start\n";
 D(\%keys);
 D(\%locks);
 
+D(\%routes);
+
 sub flood2
 {
-    my ($x, $y, $dist, $rev) = @_;
+    my ($x, $y, $dist, $origin) = @_;
 
     if (defined ($gdist{"$x,$y"}) and $gdist{"$x,$y"} < $dist)
     {
@@ -71,6 +77,16 @@ sub flood2
 
     $gdist{"$x,$y"} = $dist++ % 10;
 
+    if (my $key = $keys{"$x,$y"})
+    {
+        $origin .= ",$key=$dist";
+        $routes{"$origin"} = $dist;
+    }
+    elsif (my $lock = $locks{"$x,$y"})
+    {
+        $origin .= ",$lock=$dist";
+        $routes{"$origin"} = $dist;
+    }
     #paint(\%gdist, 0) if (! ($dist % 20));
 
     my $west = ($x - 1) . ",$y";
@@ -81,22 +97,22 @@ sub flood2
     # Try going west
     if ($grid{$west} and $grid{$west} ne '#')
     {
-        flood2($x-1, $y, $dist, 4);
+        flood2($x-1, $y, $dist, $origin);
     }
     # Try going east
     if ($grid{$east} and $grid{$east} ne '#')
     {
-        flood2($x+1, $y, $dist, 3);
+        flood2($x+1, $y, $dist, $origin);
     }
     # Try going north
     if ($grid{$north} and $grid{$north} ne '#')
     {
-        flood2($x, $y-1, $dist, 2);
+        flood2($x, $y-1, $dist, $origin);
     }
     # Try going south
     if ($grid{$south} and $grid{$south} ne '#')
     {
-        flood2($x, $y+1, $dist, 1);
+        flood2($x, $y+1, $dist, $origin);
     }
 }
 
