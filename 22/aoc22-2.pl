@@ -8,94 +8,80 @@ no warnings 'recursion';
 use Data::Dumper;
 use List::Util 'max';
 use List::MoreUtils qw (first_index);
+use bignum;
 
-my @origdeck;
-my @olddeck;
-my @newdeck;
 my @instructions;
 my $decksize;
-my $expected_result;
-
+my $pos;
 {
-    die "Usage: $0 <file> <decksize>" unless (@ARGV == 2);
+    die "Usage: $0 <file> <decksize> <pos>" unless (@ARGV == 3);
     my $file = shift @ARGV;
     $decksize = shift @ARGV;
+    $pos = shift;
 
     my $fh;
     open($fh, '<', $file);
     @instructions = <$fh>;
     close($fh);
     chomp(@instructions);
-    @origdeck = 0..($decksize-1);
     if ($instructions[-1] =~ /^Result/)
     {
-        $expected_result = pop @instructions;
+        pop @instructions;
     }
 }
 
-@olddeck = @origdeck;
+# We want to find what ends up in spot 2020. Best way I can think of is to
+# work backwards and try to find a cycle
+@instructions = reverse @instructions;
 
 foreach my $inst (@instructions)
 {
     if ($inst eq "deal into new stack")
     {
-        @newdeck = reverse(@olddeck);
+        # Find the new position
+        $pos = $decksize - 1 - $pos;
+#        print "reversed, pos = $pos\n";
     }
     elsif ($inst =~ /^cut (-?[0-9]+)$/)
     {
-        @newdeck = cut($1);
+        # uncut instead of cut
+        $pos = uncut($1);
+#        print "uncut, pos = $pos\n";
     }
     elsif ($inst =~/^deal with increment ([0-9]+)$/)
     {
-        @newdeck = deal($1);
+        # undeal instead of deal
+        $pos = undeal($1);
+#        print "undealt, pos = $pos\n";
     }
-    @olddeck = @newdeck;
 }
 
-if ($expected_result)
-{
-    my $result = "Result: " . join(" ", @newdeck);
-    if ($expected_result eq $result)
-    {
-        print "Success!\n"
-    }
-    else
-    {
-        print "$expected_result\n";
-        print "$result\n";
-    }
-}
-else
-{
-    print "Element 2019 is at: " . (first_index { $_ == 2019 } @newdeck) . "\n";
-}
+print "$pos\n";
 
-sub cut
+sub uncut
 {
     my $no = shift;
     if ($no > 0)
     {
-        return ( @olddeck[$no..($decksize - 1)], @olddeck[0..($no - 1)] );
+        return ($pos + $no) % $decksize;
     }
     else
     {
-        return ( @olddeck[($decksize + $no) .. ($decksize - 1)],
-                 @olddeck[0 .. ($#olddeck + $no)]),
+        return ($pos + $no) % $decksize;
     }
 }
 
-sub deal
+sub undeal
 {
     my $no = shift;
-    my $i = 0;
-    my @tempdeck;
-    while ($i < $decksize)
+    my $tmp = 0;
+    while (($tmp * $decksize + $pos)  % $no)
     {
-        $tempdeck[($i*$no) % $decksize] = $olddeck[$i];
-        $i++;
+        $tmp++;
     }
-    return @tempdeck;
+    return ($tmp * $decksize + $pos) / $no;
 }
+
 
 # Debug function
 sub D

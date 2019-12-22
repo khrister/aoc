@@ -57,6 +57,7 @@ if ($expected_result)
     my $result = "Result: " . join(" ", @newdeck);
     if ($expected_result eq $result)
     {
+        print "$expected_result\n";
         print "Success!\n"
     }
     else
