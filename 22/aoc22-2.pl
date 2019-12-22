@@ -9,16 +9,18 @@ use Data::Dumper;
 use List::Util 'max';
 use List::MoreUtils qw (first_index);
 use bignum;
+use bigint;
+use ntheory qw/invmod powmod/;
 
 my @instructions;
 my $decksize;
-my $pos;
+my $origpos;
+
 {
     die "Usage: $0 <file> <decksize> <pos>" unless (@ARGV == 3);
     my $file = shift @ARGV;
     $decksize = shift @ARGV;
-    $pos = shift;
-
+    $origpos = shift;
     my $fh;
     open($fh, '<', $file);
     @instructions = <$fh>;
@@ -30,56 +32,51 @@ my $pos;
     }
 }
 
-# We want to find what ends up in spot 2020. Best way I can think of is to
-# work backwards and try to find a cycle
-@instructions = reverse @instructions;
 
-foreach my $inst (@instructions)
-{
-    if ($inst eq "deal into new stack")
-    {
+
+my @results = ($origpos);
+
+my $offset = 0;
+my $increment = 1;
+
+foreach my $inst (@instructions) {
+    if ($inst eq "deal into new stack") {
         # Find the new position
-        $pos = $decksize - 1 - $pos;
-#        print "reversed, pos = $pos\n";
-    }
-    elsif ($inst =~ /^cut (-?[0-9]+)$/)
-    {
+        $increment *= -1;
+        $increment %= $decksize;
+        $offset += $increment;
+        $offset %= $decksize;
+    } elsif ($inst =~ /^cut (-?[0-9]+)$/) {
         # uncut instead of cut
-        $pos = uncut($1);
-#        print "uncut, pos = $pos\n";
-    }
-    elsif ($inst =~/^deal with increment ([0-9]+)$/)
-    {
+        uncut($1);
+    } elsif ($inst =~/^deal with increment ([0-9]+)$/) {
         # undeal instead of deal
-        $pos = undeal($1);
-#        print "undealt, pos = $pos\n";
+        undeal($1);
+    } else 
+    {
+        print "Help! Wrong instructions? $inst\n"
     }
 }
+print "offset $offset, increment $increment\n";
 
-print "$pos\n";
+my $n = 101741582076661;
+my $fininc = powmod($increment, $n, $decksize);
+my $finoff = ($offset * (1 - powmod($increment, $n, $decksize)) * powmod(1 - $increment, $decksize - 2, $decksize)) % $decksize;
+my $res = ($finoff + $fininc * $origpos) % $decksize;
+print "$res\n";
 
 sub uncut
 {
     my $no = shift;
-    if ($no > 0)
-    {
-        return ($pos + $no) % $decksize;
-    }
-    else
-    {
-        return ($pos + $no) % $decksize;
-    }
+    $offset += $increment * $no;
+    $offset %= $decksize;
 }
 
 sub undeal
 {
     my $no = shift;
-    my $tmp = 0;
-    while (($tmp * $decksize + $pos)  % $no)
-    {
-        $tmp++;
-    }
-    return ($tmp * $decksize + $pos) / $no;
+    $increment *= powmod($no, $decksize-2, $decksize);
+    $increment %= $decksize;
 }
 
 
