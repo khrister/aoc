@@ -23,27 +23,36 @@ my @inqueue = ();
     close ($fh);
 }
 
+# Start the nic code and initialize the in queues with -1
 foreach my $nicno (0..49)
 {
     $nics[$nicno] = Intcode->new({"program" => $niccode});
     $inqueue[$nicno] = [ -1 ];
 }
 
+# Loop forever until we find an answer
 while (1)
 {
+    # Loop through the NICs one by one
     foreach my $nicno (0..49)
     {
+        # Make sure we have some input
         if (! @{$inqueue[$nicno]} )
         {
             push($inqueue[$nicno], -1);
         }
+
+        # Run the NIC; collect the output
         my $out = $nics[$nicno]->run($nicno, @{$inqueue[$nicno]});
 
+        # Handle the output
         while (@{$out})
         {
             my $addr = shift $out;
             my $x = shift $out;
             my $y = shift $out;
+
+            # This is what we're looking for
             if ($addr == 255)
             {
                 print "addr 255 found, y = $y\n";
