@@ -18,8 +18,9 @@ use Class::Std;
     my %program_of  : ATTR;  # Program
     my %pos_of      : ATTR;  # position
 
-    my %status   : ATTR;  # status 0 = running, status 1 = waiting for input
-                             # status 2 = done with program
+    my %status   : ATTR( :get<status> );  # status 0 = running
+                                          # status 1 = waiting for input
+                                          # status 2 = done with program
     my %func_op = (1 => \&{"add"},
                    2 => \&{"multiply"},
                    3 => \&{"input"},
@@ -57,7 +58,8 @@ use Class::Std;
         while (1)
         {
             my $stat = $status{ident $self};
-#            print "run: $stat\n";
+#            print "run: $stat, self: " . (ident $self) , "\n";
+#            D(\%status);
             if ($stat == 0)
             {
                 $pos_of{ident $self} = do_op($self, $pos_of{ident $self}, $program_of{ident $self}->[$pos_of{ident $self}]);
@@ -83,7 +85,7 @@ use Class::Std;
         #    die("pos not in prog anymore")
         #        if ($pos > scalar @prog);
 
-#        print "pos $pos, op $op, modes $modes\n";
+        # print "pos $pos, op $op, modes $modes\n";
 
         if ($func_op{$op})
         {
@@ -99,6 +101,7 @@ use Class::Std;
         {
             print "Bad \$op: $op\n";
             D(\$program_of{ident $self});
+            print "Bad \$op: $op, pos: $pos, modes: $modes\n";
             exit;
         }
         return $pos;
@@ -143,9 +146,8 @@ use Class::Std;
         my $val;
 
         $addr = $program_of{ident $self}->[$pos + 1];
-        if ($in_of{ident $self})
+        if ($in_of{ident $self} and @{$in_of{ident $self}})
         {
-#            print "in val\n";
             $val = shift $in_of{ident $self};
         }
         else
