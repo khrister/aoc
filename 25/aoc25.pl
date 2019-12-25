@@ -9,7 +9,7 @@ use Data::Dumper;
 use IO::Prompter;
 use List::Util 'max';
 use File::FindLib 'lib/Intcode.pm';
-use Intcode;
+use Intcode qw ( decode encode );;
 
 my $puzzlecode = "";
 
@@ -45,36 +45,36 @@ sub prep
     return $s;
 }
 
-sub decode
-{
-    my $out = shift;
-    foreach my $chr (@$out)
-    {
-        #    D(\$chr);
-        if ($chr < 128)
-        {
-            print chr(int($chr));
-        }
-        else
-        {
-            print "$chr\n";
-        }
-    }
-}
-
-sub encode
-{
-    my $str = shift;
-    my @res = ();
-
-    my @entities = split(//, $str);
-    foreach my $en (@entities)
-    {
-        push(@res,ord("$en"));
-    }
-    push(@res, 10);
-    return @res;
-}
+#sub decode
+#{
+#    my $out = shift;
+#    foreach my $chr (@$out)
+#    {
+#        #    D(\$chr);
+#        if ($chr < 128)
+#        {
+#            print chr(int($chr));
+#        }
+#        else
+#        {
+#            print "$chr\n";
+#        }
+#    }
+#}
+#
+#sub encode
+#{
+#    my $str = shift;
+#    my @res = ();
+#
+#    my @entities = split(//, $str);
+#    foreach my $en (@entities)
+#    {
+#        push(@res,ord("$en"));
+#    }
+#    push(@res, 10);
+#    return @res;
+#}
 
 sub D
 {

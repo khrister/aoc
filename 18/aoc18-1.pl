@@ -10,8 +10,8 @@ use List::Util 'max';
 
 my %grid = ("0,0" => 1);
 my %gdist = ();
-my %keys = ();
-my %locks = (),
+my %keys = ('a' .. 'z');
+my %locks = ('A' .. 'Z');
 
 my %routes = ();
 
@@ -53,6 +53,7 @@ my $start = "";
 
 paint(\%grid);
 
+
 flood2(split(/,/, $start),0, "@");
 
 paint (\%gdist);
@@ -65,6 +66,11 @@ D(\%keys);
 D(\%locks);
 
 D(\%routes);
+
+sub nexus
+{
+
+}
 
 sub flood2
 {

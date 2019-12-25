@@ -7,6 +7,7 @@ use strict;
 no warnings 'substr';
 
 use base qw( Exporter );
+our @EXPORT_OK = qw( encode decode );
 
 use Class::Std;
 {
@@ -15,7 +16,7 @@ use Class::Std;
 
     # Global variables
     my %relbase_of  : ATTR;  # Relative base
-    my %program_of  : ATTR;  # Program
+    my %program_of  : ATTR( :get<program> );;  # Program
     my %pos_of      : ATTR;  # position
 
     my %status   : ATTR( :get<status> );  # status 0 = running
@@ -58,8 +59,6 @@ use Class::Std;
         while (1)
         {
             my $stat = $status{ident $self};
-#            print "run: $stat, self: " . (ident $self) , "\n";
-#            D(\%status);
             if ($stat == 0)
             {
                 $pos_of{ident $self} = do_op($self, $pos_of{ident $self}, $program_of{ident $self}->[$pos_of{ident $self}]);
@@ -75,15 +74,13 @@ use Class::Std;
         }
     }
 
-    sub do_op
+    sub do_op : PRIVATE
     {
         my $self = shift;
         my $pos = shift;
         my $op = shift;
         my $modes = shift || 0;
 
-        #    die("pos not in prog anymore")
-        #        if ($pos > scalar @prog);
 
         # print "pos $pos, op $op, modes $modes\n";
 
@@ -107,7 +104,7 @@ use Class::Std;
         return $pos;
     }
 
-    sub add
+    sub add : PRIVATE
     {
         my $self = shift;
         my $pos = shift;
@@ -120,9 +117,9 @@ use Class::Std;
         writemem($self, $pos + 3, substr($modes, -3, 1), $val1 + $val2);
 
         return $pos + 4;
-}
+    }
 
-    sub multiply
+    sub multiply : PRIVATE
     {
         my $self = shift;
         my $pos = shift;
@@ -137,7 +134,7 @@ use Class::Std;
         return $pos + 4;
     }
 
-    sub input
+    sub input : PRIVATE
     {
         my $self = shift;
         my $pos = shift;
@@ -160,7 +157,7 @@ use Class::Std;
         return $pos + 2;
     }
 
-    sub output
+    sub output : PRIVATE
     {
         my $self = shift;
         my $pos = shift;
@@ -169,7 +166,7 @@ use Class::Std;
         return $pos + 2;
     }
 
-    sub jump_if_true
+    sub jump_if_true : PRIVATE
     {
         my $self = shift;
         my $pos = shift;
@@ -187,7 +184,7 @@ use Class::Std;
         return $pos + 3;
     }
 
-    sub jump_if_false
+    sub jump_if_false : PRIVATE
     {
         my $self = shift;
         my $pos = shift;
@@ -205,7 +202,7 @@ use Class::Std;
         return $pos + 3;
     }
 
-    sub less_than
+    sub less_than : PRIVATE
     {
         my $self = shift;
         my $pos = shift;
@@ -228,7 +225,7 @@ use Class::Std;
         return $pos + 4;
     }
 
-    sub equals
+    sub equals : PRIVATE
     {
         my $self = shift;
         my $pos = shift;
@@ -252,7 +249,7 @@ use Class::Std;
         return $pos + 4;
     }
 
-    sub movebase
+    sub movebase : PRIVATE
     {
         my $self = shift;
         my $pos = shift;
@@ -266,7 +263,7 @@ use Class::Std;
     }
 
     # write to memory
-    sub writemem
+    sub writemem : PRIVATE
     {
         my $self = shift;
         my $cell = shift;
@@ -288,7 +285,7 @@ use Class::Std;
     }
 
     # fetch data from $addr or what $addr points at
-    sub fetch
+    sub fetch : PRIVATE
     {
         my $self = shift;
         my $cell = shift;
@@ -317,10 +314,41 @@ use Class::Std;
         }
     }
 
-    sub done
+    sub done : PRIVATE
     {
         my $self = shift;
         $status{ident $self} = 2;
+    }
+
+    sub decode
+    {
+        my $out = shift;
+        foreach my $chr (@$out)
+        {
+            #    D(\$chr);
+            if ($chr < 128)
+            {
+                print chr(int($chr));
+            }
+            else
+            {
+                print "$chr\n";
+            }
+        }
+    }
+
+    sub encode
+    {
+        my $str = shift;
+        my @res = ();
+
+        my @entities = split(//, $str);
+        foreach my $en (@entities)
+        {
+            push(@res,ord("$en"));
+        }
+        push(@res, 10);
+        return @res;
     }
 
     # Debug function
