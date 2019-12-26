@@ -26,6 +26,11 @@ my @inst;
 
 while(1)
 {
+    if ($ic->get_status() == 2)
+    {
+        print "Game over!\n\n";
+        exit;
+    }
     my $res = $ic->run(@inst);
     decode($res);
     my $in = prompt("");
