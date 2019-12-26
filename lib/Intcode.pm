@@ -53,7 +53,10 @@ use Class::Std;
         my $self = shift;
         my @in = @_;
 
+        return if ($status{ident $self} == 2);
+
         $in_of{ident $self} = \@in;
+
         $status{ident $self} = 0;
 
         while (1)
