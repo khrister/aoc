@@ -7,6 +7,7 @@ use warnings;
 no warnings 'recursion';
 use Data::Dumper;
 use List::Util 'max';
+use Graph::Weighted;
 
 my %grid = ("0,0" => 1);
 my %gdist = ();
@@ -51,21 +52,93 @@ my $start = "";
     }
 }
 
+#%grid = filldeadends(%grid);
+
 paint(\%grid);
 
-
 flood2(split(/,/, $start),0, "@");
+foreach my $origin ('a'..'z')
+{
+    %gdist = ();
+    print $origin . " : " . $keys{$origin}. "\n";
+    flood2(split(/,/, $keys{$origin}), 0, $origin);
+}
 
 paint (\%gdist);
 
 #D(\%gdist);
-
 print "$start\n";
 
-D(\%keys);
-D(\%locks);
+#D(\%keys);
+#D(\%locks);
 
-D(\%routes);
+#D(\%routes);
+
+sub filldeadends
+{
+    my %gr = @_;
+
+    my @deadends = ();
+
+    foreach my $p (sort keys %gr)
+    {
+        next unless ($gr{$p} eq '.');
+        if (checkneighbours($p, %gr))
+        {
+            push(@deadends, $p);
+        }
+    }
+
+    foreach my $p (@deadends)
+    {
+        my $dir = $p;
+    TUNNEL:
+        while(1)
+        {
+            my $newdir = checkneighbours($dir, %gr);
+            if ($newdir)
+            {
+                $gr{$dir} = '#';
+            }
+            else
+            {
+                last TUNNEL;
+            }
+            $dir = $newdir;
+        }
+    }
+    return %gr;
+}
+
+sub checkneighbours
+{
+    my $p = shift;
+    my %gr = @_;
+    return if ($gr{$p} =~ /[a-z]/);
+    my ($x, $y) = split(/,/, $p);
+    my $west = ($x - 1) . ",$y";
+    my $east = ($x + 1) . ",$y";
+    my $north = "$x," . ($y - 1);
+    my $south = "$x," . ($y + 1);
+    my $walls = 0;
+    my $opendir = "";
+    foreach my $dir ($west, $east, $north, $south)
+    {
+        if ($gr{$dir} eq '#')
+        {
+            $walls++;
+        }
+        elsif ($gr{$dir} =~ /[.A-Za-z]/)
+        {
+            $opendir = $dir;
+        }
+    }
+    if ($walls == 3)
+    {
+        return $opendir;
+    }
+    return "";
+}
 
 sub nexus
 {
@@ -81,19 +154,20 @@ sub flood2
         return;
     }
 
-    $gdist{"$x,$y"} = $dist++ % 10;
 
-    if (my $key = $keys{"$x,$y"})
+    if ($dist and my $key = $keys{"$x,$y"})
     {
-        $origin .= ",$key=$dist";
+        $origin .= ",$key";
         $routes{"$origin"} = $dist;
     }
-    elsif (my $lock = $locks{"$x,$y"})
+    elsif ($dist and my $lock = $locks{"$x,$y"})
     {
-        $origin .= ",$lock=$dist";
+        $origin .= ",$lock";
         $routes{"$origin"} = $dist;
     }
     #paint(\%gdist, 0) if (! ($dist % 20));
+
+    $gdist{"$x,$y"} = $dist++;
 
     my $west = ($x - 1) . ",$y";
     my $east = ($x + 1) . ",$y";
@@ -101,22 +175,22 @@ sub flood2
     my $south = "$x," . ($y + 1);
 
     # Try going west
-    if ($grid{$west} and $grid{$west} ne '#')
+    if ($grid{$west} ne '#')
     {
         flood2($x-1, $y, $dist, $origin);
     }
     # Try going east
-    if ($grid{$east} and $grid{$east} ne '#')
+    if ($grid{$east} ne '#')
     {
         flood2($x+1, $y, $dist, $origin);
     }
     # Try going north
-    if ($grid{$north} and $grid{$north} ne '#')
+    if ($grid{$north} ne '#')
     {
         flood2($x, $y-1, $dist, $origin);
     }
     # Try going south
-    if ($grid{$south} and $grid{$south} ne '#')
+    if ($grid{$south} ne '#')
     {
         flood2($x, $y+1, $dist, $origin);
     }
@@ -149,6 +223,10 @@ sub paint
             if (!defined($pixel))
             {
                 print " ";
+            }
+            elsif($pixel =~ /\d\d/)
+            {
+                print $pixel % 10;
             }
             else
             {
