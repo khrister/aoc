@@ -148,7 +148,7 @@ use Class::Std;
         $addr = $program_of{ident $self}->[$pos + 1];
         if ($in_of{ident $self} and @{$in_of{ident $self}})
         {
-            $val = shift $in_of{ident $self};
+            $val = shift @{$in_of{ident $self}};
         }
         else
         {
