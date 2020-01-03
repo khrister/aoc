@@ -9,10 +9,10 @@ use Data::Dumper;
 use List::Util 'max';
 use Graph::Weighted;
 
-my %grid = ("0,0" => 1);
+my %grid = ();
 my %gdist = ();
-my %keys = ('a' .. 'z');
-my %locks = ('A' .. 'Z');
+my %keys = ();
+my %locks = ();
 
 my %routes = ();
 
@@ -39,12 +39,12 @@ my $start = "";
             if ($p =~ /[a-z]/)
             {
                 $keys{$p} = "$x,$y";
-                $keys{"$x,$y"} = $p;
+                #$keys{"$x,$y"} = $p;
             }
             if ($p =~ /[A-Z]/)
             {
                 $locks{$p} = "$x,$y";
-                $locks{"$x,$y"} = $p;
+                #$locks{"$x,$y"} = $p;
             }
             $x++;
         }
@@ -57,7 +57,7 @@ my $start = "";
 paint(\%grid);
 
 flood2(split(/,/, $start),0, "@");
-foreach my $origin ('a'..'z')
+foreach my $origin (keys %keys)
 {
     %gdist = ();
     print $origin . " : " . $keys{$origin}. "\n";
