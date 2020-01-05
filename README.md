@@ -1,5 +1,5 @@
-My sucky code for Advent of Code 2019 (https://adventofcode.com/)
+My sucky code for Advent of Code (https://adventofcode.com/)
 
-Each day in its own directory, my puzzledata is included.
-The Intcode module is now in its own directory.
+Each year in a directory, each day in another directory,
+my puzzledata is included.
 Files are usually pushed when done with the problem.
