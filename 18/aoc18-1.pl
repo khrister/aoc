@@ -8,6 +8,9 @@ no warnings 'recursion';
 use Data::Dumper;
 use List::Util 'max';
 use Graph::Weighted;
+use Memoize;
+
+memoize('reachable');
 
 my %grid = ();
 my %gdist = ();
@@ -15,6 +18,7 @@ my %keys = ();
 my %locks = ();
 
 my %routes = ();
+my @bitmask = ();
 
 my $start = "";
 
@@ -39,12 +43,12 @@ my $start = "";
             if ($p =~ /[a-z]/)
             {
                 $keys{$p} = "$x,$y";
-                #$keys{"$x,$y"} = $p;
+                $keys{"$x,$y"} = $p;
             }
             if ($p =~ /[A-Z]/)
             {
                 $locks{$p} = "$x,$y";
-                #$locks{"$x,$y"} = $p;
+                $locks{"$x,$y"} = $p;
             }
             $x++;
         }
@@ -52,27 +56,102 @@ my $start = "";
     }
 }
 
+my $number_of_keys = scalar (grep { length($_) eq 1 } keys %keys);
+my $allbits = (2 ** ($number_of_keys)) - 1;
+
 #%grid = filldeadends(%grid);
 
-paint(\%grid);
+#paint(\%grid);
 
-flood2(split(/,/, $start),0, "@");
+flood2(split(/,/, $start),0, "@", "");
 foreach my $origin (keys %keys)
 {
+    next if (length($origin) > 1);
     %gdist = ();
-    print $origin . " : " . $keys{$origin}. "\n";
-    flood2(split(/,/, $keys{$origin}), 0, $origin);
+    my $field = ord($origin) - 97;
+    $bitmask[$field] = 2 ** $field;
+    #print $origin . " : " . $keys{$origin}. "\n";
+    flood2(split(/,/, $keys{$origin}), 0, $origin, "");
 }
 
-paint (\%gdist);
+#paint (\%gdist);
 
 #D(\%gdist);
-print "$start\n";
+#print "$start\n";
 
 #D(\%keys);
 #D(\%locks);
 
 #D(\%routes);
+
+print "Distance: " . dist_collect_keys("@", 0, {});
+print "\n";
+
+sub dist_collect_keys
+{
+
+    my $current = shift;   # What key am I standing on
+    my $foundbits = shift; # Bit 0 = a, bit 1 = b, bit 2 = c and so on
+    my $cache = shift;     # Should be a hashref, put distances here
+
+    if ($current ne '@')
+    {
+        $foundbits = set_bit($foundbits, $current);
+    }
+
+    if ($foundbits == $allbits)
+    {
+        return 0;
+    }
+
+    my $cachekey = $current . $foundbits;
+    if ($cache->{$cachekey})
+    {
+        return $cache->{$cachekey};
+    }
+    my $result = 1e999;
+    foreach my $key (reachable($foundbits))
+    {
+        my $tmp;
+        next if ($key eq $current);
+#        print "Serching from $key foundbits = $foundbits, $allbits\n";
+        $tmp = $routes{"$current,$key"}->[0] + dist_collect_keys($key, $foundbits, $cache);
+#        print "$tmp\n";
+        if ($tmp < $result)
+        {
+            $result = $tmp;
+        }
+    }
+    $cache->{$cachekey} = $result;
+    return $result;
+}
+
+sub reachable
+{
+    my $bits = shift;
+    my @result = ();
+ KEY:
+    foreach my $key (%keys)
+    {
+        next KEY if (length($key) > 1);
+        next KEY if ($bitmask[ord($key) - 97] & $bits);
+        my $locks = $routes{"@,$key"}->[1];
+        foreach my $lock (split(//, $locks))
+        {
+            my $tmp = $bitmask[ord(lc($lock)) - 97];
+            next KEY unless ($tmp & $bits)
+        }
+        push(@result, $key);
+    }
+    return @result;
+}
+
+sub set_bit
+{
+    my $field = shift;
+    my $key = shift;
+    return $field | $bitmask[ord($key) - 97];
+}
 
 sub filldeadends
 {
@@ -140,30 +219,23 @@ sub checkneighbours
     return "";
 }
 
-sub nexus
-{
-
-}
-
 sub flood2
 {
-    my ($x, $y, $dist, $origin) = @_;
-
+    my ($x, $y, $dist, $origin, $seen_locks) = @_;
     if (defined ($gdist{"$x,$y"}) and $gdist{"$x,$y"} < $dist)
     {
         return;
     }
 
-
-    if ($dist and my $key = $keys{"$x,$y"})
+    my $key = $keys{"$x,$y"};
+    if ($dist and $key)
     {
-        $origin .= ",$key";
-        $routes{"$origin"} = $dist;
+        # print "Started at $origin, found $key, seen $seen_locks\n";
+        $routes{"$origin,$key"} = [ $dist, $seen_locks ]
     }
-    elsif ($dist and my $lock = $locks{"$x,$y"})
+    elsif (my $lock = $locks{"$x,$y"})
     {
-        $origin .= ",$lock";
-        $routes{"$origin"} = $dist;
+        $seen_locks .= $lock;
     }
     #paint(\%gdist, 0) if (! ($dist % 20));
 
@@ -177,22 +249,22 @@ sub flood2
     # Try going west
     if ($grid{$west} ne '#')
     {
-        flood2($x-1, $y, $dist, $origin);
+        flood2($x-1, $y, $dist, $origin, $seen_locks);
     }
     # Try going east
     if ($grid{$east} ne '#')
     {
-        flood2($x+1, $y, $dist, $origin);
+        flood2($x+1, $y, $dist, $origin, $seen_locks);
     }
     # Try going north
     if ($grid{$north} ne '#')
     {
-        flood2($x, $y-1, $dist, $origin);
+        flood2($x, $y-1, $dist, $origin, $seen_locks);
     }
     # Try going south
     if ($grid{$south} ne '#')
     {
-        flood2($x, $y+1, $dist, $origin);
+        flood2($x, $y+1, $dist, $origin, $seen_locks);
     }
 }
 
