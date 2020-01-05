@@ -40,6 +40,7 @@ foreach my $i (0 .. $#boxes - 1)
                 print $a[$k] if ($a[$k] eq $b[$k]);
             }
             print "\n";
+            exit;
         }
     }
 }
