@@ -10,15 +10,13 @@ use Memoize;
 
 memoize('reachable');
 
-my %grid = ();
-my %gdist = ();
-my %keys = ();
-my %locks = ();
-
-my %routes = ();
-my @bitmask = ();
-
-my $start = "";
+my %grid = ();    # The starting grid
+my %gdist = ();   # Distances from a point in the maze
+my %keys = ();    # Where the keys are
+my %locks = ();   # Where the locks are
+my %routes = ();  # key: start,end, values: (distance, locks in the way)
+my @bitmask = (); # bitmask of all keys found
+my $start = "";   # This the robot starting position
 
 {
     my $file = shift @ARGV;
@@ -54,31 +52,28 @@ my $start = "";
     }
 }
 
+# Number of keys dictates the size of the bitfield
 my $number_of_keys = scalar (grep { length($_) eq 1 } keys %keys);
+# All bits set
 my $allbits = (2 ** ($number_of_keys)) - 1;
 
-#paint(\%grid);
-
+# Get routes from the starting point
 flood2(split(/,/, $start),0, "@", "");
+
+# And from all keys. I could optimize by avoiding reverses,
+# but it's quick anyway
 foreach my $origin (keys %keys)
 {
     next if (length($origin) > 1);
     %gdist = ();
+
+    # Seed the bitmask array
     my $field = ord($origin) - 97;
     $bitmask[$field] = 2 ** $field;
-    #print $origin . " : " . $keys{$origin}. "\n";
+
+    # And find the routes to all other keys from here
     flood2(split(/,/, $keys{$origin}), 0, $origin, "");
 }
-
-#paint (\%gdist);
-
-#D(\%gdist);
-#print "$start\n";
-
-#D(\%keys);
-#D(\%locks);
-
-#D(\%routes);
 
 print "Distance: " . dist_collect_keys("@", 0, {});
 print "\n";
@@ -90,11 +85,14 @@ sub dist_collect_keys
     my $foundbits = shift; # Bit 0 = a, bit 1 = b, bit 2 = c and so on
     my $cache = shift;     # Should be a hashref, put distances here
 
+    # As long as we have moved away from teh start, add current
+    # to the bitmask
     if ($current ne '@')
     {
         $foundbits = set_bit($foundbits, $current);
     }
 
+    # If all bits are set, we're done
     if ($foundbits == $allbits)
     {
         return 0;
@@ -110,9 +108,8 @@ sub dist_collect_keys
     {
         my $tmp;
         next if ($key eq $current);
-#        print "Serching from $key foundbits = $foundbits, $allbits\n";
-        $tmp = $routes{"$current,$key"}->[0] + dist_collect_keys($key, $foundbits, $cache);
-#        print "$tmp\n";
+        $tmp = $routes{"$current,$key"}->[0]
+            + dist_collect_keys($key, $foundbits, $cache);
         if ($tmp < $result)
         {
             $result = $tmp;
