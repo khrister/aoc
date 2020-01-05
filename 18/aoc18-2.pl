@@ -10,15 +10,14 @@ use Memoize;
 
 memoize('reachable');
 
-my %grid = ();    # The starting grid
-my %gdist = ();   # Distances from a point in the maze
-my %keys = ();    # Where the keys are
-my %locks = ();   # Where the locks are
-
-my %routes = ();  # key: start,end, values: (distance, locks in the way)
-my @bitmask = (); # bitmask of all keys found
-
-my @starts = ();  # These are the robots starting positions
+my %grid = ();           # The starting grid
+my %gdist = ();          # Distances from a point in the maze
+my %keys = ();           # Where the keys are
+my %locks = ();          # Where the locks are
+my %routes = ();         # key: start,end, values: (distance, locks in the way)
+my @bitmask = ();        # bitmask of all keys found
+my @starts = ();         # These are the robots starting positions
+my %key_to_robot = ();   # Which robot can reach which key
 
 {
     my $start = "";
@@ -71,38 +70,34 @@ my @starts = ();  # These are the robots starting positions
     }
 }
 
+# Number of keys dictates the size of the bitfield
 my $number_of_keys = scalar (grep { length($_) eq 1 } keys %keys);
+# All bits set
 my $allbits = (2 ** ($number_of_keys)) - 1;
 
-paint(\%grid);
-
+# Get all routes from the starting points
 foreach my $i (0..3)
 {
     flood2(split(/,/, $starts[$i]), 0, "$i", "");
 }
 
+# And from all keys (I could be smarter and not do reverses here,
+# but it's pretty quick anyway
 foreach my $origin (keys %keys)
 {
     next if (length($origin) > 1);
     %gdist = ();
+
+    # Seed the bitmask array
     my $field = ord($origin) - 97;
     $bitmask[$field] = 2 ** $field;
-    print $origin . " : " . $keys{$origin}. "\n";
+
+    # And find the routes to all other keys from here
     flood2(split(/,/, $keys{$origin}), 0, $origin, "");
 }
 
-#paint (\%gdist);
-
-#D(\%gdist);
-#print "$start\n";
-
-#D(\%keys);
-#D(\%locks);
-
-D(\%routes);
-
-#print "Distance: " . dist_collect_keys("@", 0, {}, @starts);
-#print "\n";
+print "Distance: " . dist_collect_keys("0", 0, {}, 0..3);
+print "\n";
 
 sub dist_collect_keys
 {
@@ -111,7 +106,10 @@ sub dist_collect_keys
     my $foundbits = shift; # Bit 0 = a, bit 1 = b, bit 2 = c and so on
     my $cache = shift;     # Should be a hashref, put distances here
     my @robots = @_;       # Current robot positions
-    if ($current ne '@')
+
+    # If we're standing on a key (and not a starting position,
+    # add it to the found keys mask
+    if ($current !~ /[0-9]/)
     {
         $foundbits = set_bit($foundbits, $current);
     }
@@ -121,7 +119,7 @@ sub dist_collect_keys
         return 0;
     }
 
-    my $cachekey = $current . $foundbits;
+    my $cachekey = join("", @robots) . $foundbits;
     if ($cache->{$cachekey})
     {
         return $cache->{$cachekey};
@@ -130,10 +128,11 @@ sub dist_collect_keys
     foreach my $key (reachable($foundbits))
     {
         my $tmp;
-        next if ($key eq $current);
-#        print "Serching from $key foundbits = $foundbits, $allbits\n";
-        $tmp = $routes{"$current,$key"}->[0] + dist_collect_keys($key, $foundbits, $cache);
-#        print "$tmp\n";
+        my $currobot =  $robots[$key_to_robot{$key}];
+        next if ($currobot eq $key);
+        my @newrobots = @robots;
+        $newrobots[$key_to_robot{$key}] = $key;
+        $tmp = $routes{$robots[$key_to_robot{$key}] . ",$key"}->[0] + dist_collect_keys($key, $foundbits, $cache, @newrobots);
         if ($tmp < $result)
         {
             $result = $tmp;
@@ -152,7 +151,7 @@ sub reachable
     {
         next KEY if (length($key) > 1);
         next KEY if ($bitmask[ord($key) - 97] & $bits);
-        my $locks = $routes{"@,$key"}->[1];
+        my $locks = $routes{$key_to_robot{$key} . ",$key"}->[1];
         foreach my $lock (split(//, $locks))
         {
             my $tmp = $bitmask[ord(lc($lock)) - 97];
@@ -181,14 +180,16 @@ sub flood2
     my $key = $keys{"$x,$y"};
     if ($dist and $key)
     {
-        # print "Started at $origin, found $key, seen $seen_locks\n";
-        $routes{"$origin,$key"} = [ $dist, $seen_locks ]
+        $routes{"$origin,$key"} = [ $dist, $seen_locks ];
+        if ($origin =~ /[0-9]/)
+        {
+            $key_to_robot{$key} = $origin;
+        }
     }
     elsif (my $lock = $locks{"$x,$y"})
     {
         $seen_locks .= $lock;
     }
-    #paint(\%gdist, 0) if (! ($dist % 20));
 
     $gdist{"$x,$y"} = $dist++;
 
