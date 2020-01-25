@@ -60,9 +60,10 @@ my $ymax = 0;
 #D(\%grid);
 #D(\@points);
 #D(\%collpoints);
-paint(\%grid, \@points);
-print "\n\n";
+#paint(\%grid, \@points);
+#print "\n\n";
 #exit;
+
 my $tick = 0;
 TICK:
 while (1)
@@ -104,7 +105,7 @@ while (1)
             print "Illegal direction $dir, aborting\n";
             exit;
         }
-        print "Moving from $x,$y to $p0, dir $dir\n";
+#        print "Moving from $x,$y to $p0, dir $dir\n";
 
         if (!$grid{$p0})
         {
@@ -125,12 +126,12 @@ while (1)
         $collpoints{$p0} = 1;
         if ($grid{$p0} !~ /[-|]/)
         {
-            print "Turning at $p0 (" . $grid{$p0} . ")\n";
+#            print "Turning at $p0 (" . $grid{$p0} . ")\n";
             turn($point, $p0);
         }
     }
     $tick++;
-    print "Tick $tick done\n";
+#    print "Tick $tick done\n";
     #D(\@points);
     #D(\%collpoints);
     #paint(\%grid, \@points);
@@ -161,9 +162,9 @@ sub turn
         my $i = first_index { $_ eq $dir } @dirs;
         my $change = $phase - 1;
         $p->[2] = $dirs[($change + $i) % 4];
-        print "Previous phase: $phase dir $dir, ";
+#        print "Previous phase: $phase dir $dir, ";
         $phase = ($phase + 1 ) % 3;
-        print "current phase: $phase dir " . $p->[2] . "\n";
+#        print "current phase: $phase dir " . $p->[2] . "\n";
         $p->[3] = $phase;
     }
     else
