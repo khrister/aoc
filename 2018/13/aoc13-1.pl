@@ -74,8 +74,10 @@ while (1)
     {
         print "Error in number of points in collision check and pointlist\n";
     }
-    foreach my $point (@points)
+    my $i = 0;
+    while ($i <= $#points)
     {
+        my $point = $points[$i];
         my $dir = $point->[2];
         my $p0;
         my $x = $point->[0];
@@ -129,6 +131,7 @@ while (1)
 #            print "Turning at $p0 (" . $grid{$p0} . ")\n";
             turn($point, $p0);
         }
+        $i++;
     }
     $tick++;
 #    print "Tick $tick done\n";
