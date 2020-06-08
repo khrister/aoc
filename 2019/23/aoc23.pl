@@ -39,7 +39,7 @@ while (1)
         # Make sure we have some input
         if (! @{$inqueue[$nicno]} )
         {
-            push($inqueue[$nicno], -1);
+            push(@{$inqueue[$nicno]}, -1);
         }
 
         # Run the NIC; collect the output
@@ -48,9 +48,9 @@ while (1)
         # Handle the output
         while (@{$out})
         {
-            my $addr = shift $out;
-            my $x = shift $out;
-            my $y = shift $out;
+            my $addr = shift @{$out};
+            my $x = shift @{$out};
+            my $y = shift @{$out};
 
             # This is what we're looking for
             if ($addr == 255)
@@ -64,7 +64,7 @@ while (1)
             }
             else
             {
-                push($inqueue[$addr], $x, $y);
+                push(@{$inqueue[$addr]}, $x, $y);
             }
         }
     }

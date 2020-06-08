@@ -37,15 +37,15 @@ while (1)
     {
         if (! @{$inqueue[$nicno]} )
         {
-            push($inqueue[$nicno], -1);
+            push(@{$inqueue[$nicno]}, -1);
         }
         my $out = $nics[$nicno]->run(@{$inqueue[$nicno]});
         $inqueue[$nicno] = [ ];
         while (@{$out})
         {
-            my $addr = shift $out;
-            my $x = shift $out;
-            my $y = shift $out;
+            my $addr = shift @{$out};
+            my $x = shift @{$out};
+            my $y = shift @{$out};
             if ($addr == 255)
             {
                 @nat = ($x, $y);
@@ -56,7 +56,7 @@ while (1)
             }
             else
             {
-                push($inqueue[$addr], $x, $y);
+                push(@{$inqueue[$addr]}, $x, $y);
             }
         }
     }
@@ -77,7 +77,7 @@ while (1)
             print "twice in a row, y = $lastnaty\n";
             exit;
         }
-        push($inqueue[0], @nat);
+        push(@{$inqueue[0]}, @nat);
         $lastnaty = $nat[1];
     }
 }
