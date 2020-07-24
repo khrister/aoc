@@ -49,14 +49,10 @@ my %elves = ();    # Elves (also with 200 hp)
     }
 }
 
-paint(\%grid);
-
-D(\%goblins);
-D(\%elves);
-my %gd = ();
-my ($x, $y) = split(/,/, (keys %goblins)[0]);
-flood(\%gd, $x, $y, 0);
-paint (\%gd);
+while (1)
+{
+    my @queue = sort { $a <=> $b } (keys %elves, keys %goblins);
+}
 
 sub flood
 {
