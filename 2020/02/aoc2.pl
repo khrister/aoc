@@ -9,7 +9,8 @@ use Data::Dumper;
 use List::Util 'max';
 use List::MoreUtils qw (first_index);
 
-my @expenses;
+my @passwords;
+my $valids;
 
 {
     die "Usage: $0 <file>" unless (@ARGV == 1);
@@ -17,25 +18,34 @@ my @expenses;
 
     my $fh;
     open($fh, '<', $file);
-    @expenses = <$fh>;
+    @passwords = <$fh>;
     close($fh);
-    chomp(@expenses);
+    chomp(@passwords);
 }
 
-foreach my $exp (@expenses)
+foreach my $line (@passwords)
 {
-#    print "Checking $exp\n";
+#    print "Checking $line\n";
 
-    foreach my $exp2 (@expenses)
+    my ($range, $letter, $passwd) = split(/ /, $line);
+    $letter = substr($letter, 0, 1);
+
+    my ($min, $max) = split(/-/, $range);
+    my $count = length($passwd =~ s/[^$letter]//rg);
+
+    if ($count >= $min and $count <= $max)
     {
-        if ($exp + $exp2 == 2020)
-        {
-            print "$exp + $exp2 = 2020, $exp * $exp2 = " .
-                ($exp * $exp2) . "\n";
-            exit;
-        }
+#        print "$line => valid\n";
+        $valids++;
+    }
+    else
+    {
+#        print "$line => NOT valid\n";
     }
 }
+
+print "Number of valid passwords: $valids\n";
+
 
 # Debug function
 sub D
