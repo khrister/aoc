@@ -50,7 +50,7 @@ foreach my $pass (@passes)
         }
         $pos++;
     }
-    print "Row: $row, ";
+    #print "Row: $row, ";
 
     $pos = 0;
 
@@ -64,7 +64,7 @@ foreach my $pass (@passes)
         $pos++;
     }
     $id = $row * 8 + $col;
-    print "Col: $col, Id: $id\n";
+    #print "Col: $col, Id: $id\n";
     $highest_id = $id if ($id > $highest_id);
 }
 
