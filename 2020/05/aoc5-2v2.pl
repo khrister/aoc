@@ -13,6 +13,9 @@ use IO::Handle;
 # Global variables
 my @passes;
 my $highest_id = 0;
+my $lowest_id = 1000000;
+
+my %ids;
 
 STDOUT->autoflush(1);
 
@@ -30,17 +33,25 @@ STDOUT->autoflush(1);
     close $file;
 }
 
-foreach my $pass (@passes)
+foreach my $id (@passes)
 {
     # Change the string to a binary string
-    $pass =~ tr/FBLR/0101/;
+    $id =~ tr/FBLR/0101/;
     # Change it to decimal
-    $pass = unpack("N", pack("B32", substr("0" x 32 . $pass, -32)));
-
-    $highest_id = $pass if ($pass > $highest_id);
+    $id = unpack("N", pack("B32", substr("0" x 32 . $id, -32)));
+    $ids{$id} = 1;
+    $highest_id = $id if ($id > $highest_id);
+    $lowest_id = $id if ($id < $lowest_id);
 }
 
-print "Highest id: $highest_id\n";
+foreach my $id (($lowest_id + 1) .. ($highest_id - 1))
+{
+    next if ($ids{$id});
+    next unless ($ids{$id - 1} and $ids{$id + 1});
+    print "Seat id: $id\n";
+    exit;
+}
+
 
 # Debug function
 sub D
