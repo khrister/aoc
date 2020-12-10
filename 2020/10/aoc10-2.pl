@@ -34,7 +34,6 @@ push(@numbers, 0);
 print "Check: " . check(0) . "\n";;
 
 # Recurse until we've checked all paths
-
 sub check
 {
     my $this = shift;
