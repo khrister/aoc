@@ -44,7 +44,8 @@ sub check
     my $sum = 0;
 
     # Loop over the next three numbers if they match the criteria
-    while ($i < @numbers && $i <= $this + 4 && $numbers[$i] <= $numbers[$this] + 3)
+    while ($i < @numbers && $i <= $this + 4 && 
+               $numbers[$i] <= $numbers[$this] + 3)
     {
         my $tmp = check($i);
         $sum += $tmp;
