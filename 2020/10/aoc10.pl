@@ -30,8 +30,6 @@ STDOUT->autoflush(1);
 push(@numbers, 0);
 @numbers = sort { $a <=> $b } @numbers;
 
-D(\@numbers);
-
 my $i = 0;
 while ($i < scalar(@numbers) - 1)
 {
