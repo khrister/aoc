@@ -85,7 +85,6 @@ sub tick
     my %cur = %{shift()};
     my %new = ();
 
-#    D(\%cur);
  CUBE:
     foreach my $cube (keys %cur)
     {
