@@ -33,51 +33,14 @@ foreach my $calc (@calculations)
     {
         my $c = $1;
         $c =~ s/[()]//g;
-        $c = do_calc(split(//, $c));
+        $c = eval $c;
         $calc =~ s/XX/$c/;
         $calc =~ s/(\d+(\+\d+)+)/($1)/g;
     }
-    push(@values, do_calc(split(//, $calc)));
+    push(@values, eval $calc);
 }
 
 print "Sum: " . sum(@values) . "\n";;
-
-sub do_calc
-{
-    my @calc = @_;
-    my $i = 0;
-    my $operator;
-    my $cur = 0;
-    while ($i < @calc)
-    {
-        my $char = $calc[$i];
-        if ($char =~ /[+*]/)
-        {
-            $operator = $char;
-        }
-        else
-        {
-            my $j = $i + 1;
-            while (defined($calc[$j]) and $calc[$j] =~ /[0-9]/)
-            {
-                $char .= $calc[$j++];
-                $i++;
-            }
-            if ($operator)
-            {
-                $cur = eval "$cur $operator $char";
-                $operator = undef;
-            }
-            else
-            {
-                $cur = $char;
-            }
-        }
-
-        $i++;
-    }
-    return $cur;
-}
 
 # Debug function
 sub D
