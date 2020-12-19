@@ -30,7 +30,7 @@ my $reg = "";
 }
 
 $rules{8} = '42 +';
-$rules{11} = '42 31 | 42 42 31 31 | 42 42 42 31 31 31 | 42 42 42 42 31 31 31 31';
+$rules{11} = '42 31 | 42 {2} 31 {2} | 42 {3} 31 {3} | 42 {4} 31 {4}';
 
 $reg = make_rule(0);
 
@@ -54,7 +54,7 @@ sub make_rule
             $rule .= $r;
         }
     }
-    $rule = "(" . $rule . ")" unless ($rule =~ /^[ab]+$/);
+    $rule = "(" . $rule . ")" if ($rule =~ /[|]/);
     return $rule;
 }
 
