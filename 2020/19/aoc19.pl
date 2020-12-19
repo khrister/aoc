@@ -38,7 +38,7 @@ print "" . (scalar @res) . "\n";
 sub make_rule
 {
     my $rv = shift;
-    my $rule = "(?:";
+    my $rule = "";
     foreach my $r (split(/ /, $rules{$rv}))
     {
         if ($r =~ /^[0-9]+$/)
@@ -51,7 +51,8 @@ sub make_rule
             $rule .= $r;
         }
     }
-    $rule .= ")";
+    $rule = "(" . $rule . ")" unless ($rule =~ /^[ab]+$/);
+    return $rule;
 }
 
 # Debug function
