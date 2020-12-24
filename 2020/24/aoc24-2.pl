@@ -53,11 +53,74 @@ foreach my $tile (@data)
     {
         $ew++; $nwse++; $swne++;
     }
-    $seen{"$ew,$nwse,$swne"}++;
+    $seen{"$ew,$swne"}++;
+    $seen{"$ew,$swne"} %= 2;
 }
 
-print "" . (grep { $_ == 1 } values %seen) . "\n";
+foreach my $day (1..100)
+{
+    my %newseen = ();
+    my @blacks = grep { $seen{$_} == 1 } keys %seen;
+    # Check all black tiles, create adjacent if necessary
+    foreach my $tile (@blacks)
+    {
+        my $bneighbours = 0;
+        my ($ew, $swne) = split(/,/, $tile);
+        # Check all dirs
+        foreach my $ew0 (-1, 0, 1)
+        {
+            foreach my $swne0 (-1, 0, 1)
+            {
+                next if ($ew0 == 0 and $swne0 == 0);
+                next if (abs($ew0 - $swne0) == 2);
+                my $ew1 = $ew0 + $ew;
+                my $swne1 = $swne0 + $swne;
+                $seen{"$ew1,$swne1"} = 0 unless defined($seen{"$ew1,$swne1"});
+                $bneighbours += $seen{"$ew1,$swne1"};
+            }
+        }
+        if ($bneighbours == 0 or $bneighbours > 2)
+        {
+            $newseen{$tile} = 0;
+        }
+        else
+        {
+            $newseen{$tile} = 1;
+        }
+    }
+    my @whites = grep { $seen{$_} == 0 } keys %seen;
 
+    foreach my $tile (@whites)
+    {
+        my $bneighbours = 0;
+        my ($ew, $swne) = split(/,/, $tile);
+        # Check all dirs
+        foreach my $ew0 (-1, 0, 1)
+        {
+        INNER:
+            foreach my $swne0 (-1, 0, 1)
+            {
+                next INNER if ($ew0 == 0 and $swne0 == 0);
+                next INNER if (abs($ew0 - $swne0) == 2);
+                my $ew1 = $ew0 + $ew;
+                my $swne1 = $swne0 + $swne;
+                $seen{"$ew1,$swne1"} = 0 unless defined($seen{"$ew1,$swne1"});
+                $bneighbours += $seen{"$ew1,$swne1"};
+            }
+        }
+        if ($bneighbours == 2)
+        {
+            $newseen{$tile} = 1;
+        }
+        else
+        {
+            $newseen{$tile} = 0;
+        }
+    }
+
+    %seen = %newseen;
+    print "Day $day, " . (grep { $_ == 1 } values %seen) . "\n";
+}
 # Debug function
 sub D
 {
