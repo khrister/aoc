@@ -119,8 +119,11 @@ foreach my $day (1..100)
     }
 
     %seen = %newseen;
-    print "Day $day, " . (grep { $_ == 1 } values %seen) . "\n";
+#    print "Day $day, " . (grep { $_ == 1 } values %seen) . "\n";
 }
+
+print "" . (grep { $_ == 1 } values %seen) . "\n";
+
 # Debug function
 sub D
 {
