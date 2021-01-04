@@ -28,14 +28,17 @@ foreach my $calc (@calculations)
 {
     my $level = 0;
     $calc =~ s/ //g;
-    $calc =~ s/(\d+(\+\d+)+)/($1)/g;
+    #print "$calc\n";
+    $calc =~ s/(\d+(\+\d+)+)/($1)/;
     while ($calc =~ s/(\([^()]+\))/XX/)
     {
+        #print "$calc\n";
         my $c = $1;
         $c =~ s/[()]//g;
         $c = eval $c;
         $calc =~ s/XX/$c/;
-        $calc =~ s/(\d+(\+\d+)+)/($1)/g;
+        #print "$calc\n";
+        $calc =~ s/(\d+(\+\d+)+)/($1)/;
     }
     push(@values, eval $calc);
 }
