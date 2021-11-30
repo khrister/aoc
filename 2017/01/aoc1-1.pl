@@ -23,7 +23,7 @@ my $total = 0;
 $number = $number . substr($number, -1);
 print "$number\n";
 my @dupes = $number =~ m/(.)(?=\1)/g;
-D(@dupes);
+D(\@dupes);
 print "Sum: " . sum(@dupes) . "\n";
 
 sub D
