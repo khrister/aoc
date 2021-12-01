@@ -24,19 +24,23 @@ my @readings;
 
 #D(\@readings);
 
-my $prevdepth;
+my @window;
 my $increases;
 
 DEPTH:
 foreach my $depth (@readings)
 {
-    if (!defined($prevdepth))
+    if (scalar(@window) < 3)
     {
-        $prevdepth = $depth;
+        push(@window, $depth);
         next DEPTH;
     }
+    my $prevdepth = sum(@window);
+    shift(@window);
+    push(@window, $depth);
+    my $curdepth = sum(@window);
 
-    $increases++ if ($depth > $prevdepth);
+    $increases++ if ($curdepth > $prevdepth);
     $prevdepth = $depth;
 }
 
