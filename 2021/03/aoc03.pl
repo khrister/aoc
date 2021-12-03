@@ -46,9 +46,6 @@ sub ones
 
 #D(\@ones);
 
-my $gamma = "0b";
-my $epsilon = "0b";
-
 foreach my $digit (@ones)
 {
     if ($digit > (@numbers / 2))
