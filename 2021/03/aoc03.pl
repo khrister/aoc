@@ -25,17 +25,26 @@ my @ones;
 
 #D(\@numbers);
 
-foreach my $num (@numbers)
+sub ones
 {
-    my @bits;
-    @bits = split(//, $num);
-    for (my $i = 0; $i <= $#bits; $i++)
+    my @lnums = @_;
+    my @lones;
+
+    foreach my $num (@lnums)
     {
-        $ones[$i] += $bits[$i];
+        my @bits;
+        @bits = split(//, $num);
+        for (my $i = 0; $i <= $#bits; $i++)
+        {
+            $lones[$i] += $bits[$i];
+        }
     }
+    return @lones;
 }
 
-D(\@ones);
+@ones = ones(@numbers);
+
+#D(\@ones);
 
 my $gamma = "0b";
 my $epsilon = "0b";
@@ -55,6 +64,44 @@ foreach my $digit (@ones)
 }
 
 print "Power Consumption: " . (oct($gamma) * oct($epsilon)) . "\n";
+my @gammas = @numbers;
+
+for (my $i = 0; $i <= length($gammas[0]); $i++)
+{
+    @ones = ones(@gammas);
+    if ($ones[$i] >= (@gammas / 2))
+    {
+        @gammas = grep { substr($_, $i, 1) == 1 } @gammas;
+    }
+    else
+    {
+        @gammas = grep { substr($_, $i, 1) == 0 } @gammas;
+    }
+#    print "i = $i\n";
+#    D(\@gammas);
+    last if ($#gammas == 0);
+}
+
+my @epsilons = @numbers;
+
+for (my $i = 0; $i <= length($epsilons[0]); $i++)
+{
+    @ones = ones(@epsilons);
+    if ($ones[$i] < (@epsilons / 2))
+    {
+        @epsilons = grep { substr($_, $i, 1) == 1 } @epsilons;
+    }
+    else
+    {
+        @epsilons = grep { substr($_, $i, 1) == 0 } @epsilons;
+    }
+#    print "i = $i\n";
+#    D(\@epsilons);
+    last if ($#epsilons == 0);
+}
+
+print "Life support rating "
+    . (oct("0b" . $gammas[0]) * oct("0b" . $epsilons[0])) . "\n";
 
 # Debug function
 sub D
