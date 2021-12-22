@@ -27,15 +27,28 @@ my @boards;
     close($fh);
 }
 
-D(\@numbers);
+
+@boards = map { $_ =~ s/^ //mg; $_ } @boards;
 
 @boards = map { [ split(/\n/) ] } @boards;
+
+foreach my $board (@boards)
+{
+    $board = [ map { [ split(/ +/) ] } @{$board} ];
+    foreach my $idx (5..9)
+    {
+        foreach my $foo  (0..4)
+        {
+            push(@{$board->[$idx]}, $board->[$foo]->[$idx - 5] );
+        }
+    }
+}
 
 D(\@boards);
 
 foreach my $board (@boards)
 {
-    D($board);
+
 
 }
 
