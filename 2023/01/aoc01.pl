@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Copyright Christer Boräng (mort@chalmers.se) 2022
+# Copyright Christer Boräng (mort@chalmers.se) 2023
 
 # Always use strict and warnings
 use strict;
