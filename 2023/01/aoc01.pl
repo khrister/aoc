@@ -87,6 +87,6 @@ Written by Christer Boräng (mort@chalmers.se)
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright Christer Boräng 2019
+Copyright Christer Boräng 2023
 
 =cut
