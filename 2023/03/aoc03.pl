@@ -14,10 +14,9 @@ use Array::Utils qw(:all);
 
 # Global variables
 my @grid = ();
-my $x = 0;
-my $y = 0;
 my $xmax = 0;
 my $ymax = 0;
+my $sum = 0;
 
 {
     die "Usage: $0 <file>" unless (@ARGV == 1);
@@ -41,7 +40,71 @@ my $ymax = 0;
     $ymax = $#grid;
 }
 
-print "$xmax $ymax\n";
+
+ROW:
+foreach my $y (0..$ymax)
+{
+ COL:
+    for(my $x = 0; $x <= $xmax; $x++)
+    {
+        my $cur = $grid[$y]->[$x];
+        next COL unless $cur =~ /[0-9]/;
+
+        my $num = $cur;
+    DIGIT:
+        foreach my $digit (($x+1)..$xmax)
+        {
+            my $next = $grid[$y]->[$digit];
+            last DIGIT unless ($next =~ /[0-9]/);
+
+            $num .= $next;
+            $x++;
+        }
+        # print "$num\n";
+        # Now find if there is a symbol next to it
+        my $numlen = length($num);
+        my $part = 0;
+
+        # Check above
+        $part = check($x - $numlen, $x + 1, $y - 1);
+        # Check below
+        $part += check($x - $numlen, $x + 1, $y + 1);
+        # Check to the right
+        $part += check($x + 1, $x + 1, $y);
+        # And check to the left
+        $part += check($x - $numlen, $x - $numlen, $y);
+
+
+        if ($part)
+        {
+            $sum += $num;
+        }
+
+    }
+}
+
+sub check
+{
+    my $xstart = shift;
+    my $xend = shift;
+    my $y = shift;
+
+    # Stay inbounds
+    return 0 if ($y < 0);
+    return 0 if ($y > $ymax);
+    $xstart++ if ($xstart < 0);
+    $xend = $xmax if ($xend > $xmax);
+
+    foreach my $x ($xstart .. $xend)
+    {
+        my $sym = $grid[$y]->[$x];
+        return 1 if ($sym !~ /[0-9.]/);
+    }
+    return 0;
+}
+
+
+print "$sum\n";
 
 #D(\@grid);
 
