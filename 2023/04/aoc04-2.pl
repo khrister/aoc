@@ -6,11 +6,14 @@ use strict;
 use warnings;
 no warnings 'recursion';
 use Data::Dumper;
+use Memoize;
 
 # Other modules
 use List::Util qw (max sum);
 use List::MoreUtils qw (first_index);
 use Array::Utils qw(:all);
+
+memoize('score');
 
 # Global variables
 my $sum = 0;
