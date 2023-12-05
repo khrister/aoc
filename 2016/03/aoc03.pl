@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Copyright Christer Boräng (mort@chalmers.se) 2019
+# Copyright Christer Boräng (mort@chalmers.se) 2023
 
 # Always use strict and warnings
 use strict;
@@ -79,6 +79,6 @@ Written by Christer Boräng (mort@chalmers.se)
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright Christer Boräng 2019
+Copyright Christer Boräng 2023
 
 =cut
