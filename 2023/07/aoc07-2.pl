@@ -48,8 +48,7 @@ print "Winnings: $winnings\n";
 
 sub score
 {
-    my $a = shift;
-    my $hand = $a;
+    my $hand = shift;
     $hand =~ tr/J/Z/;
     $hand = join("", sort(split("", $hand)));
     $hand =~ tr/Z/J/;
