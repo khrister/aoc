@@ -12,6 +12,11 @@ use List::Util qw (max sum min);
 use List::MoreUtils qw (first_index);
 use Array::Utils qw(:all);
 
+#
+# Optimisering: Baklänges, från 0 och uppåt, testa med ett intervall X
+# tills man hittar ett seed, sen gå tillbaka och testa mer exakt
+#
+
 # Global variables
 my $location;
 my @seeds;
