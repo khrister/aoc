@@ -13,6 +13,12 @@ use List::MoreUtils qw (first_index);
 use Array::Utils qw(:all);
 
 # Global variables
+my @left;
+my @right;
+my %right_of;
+
+my $sum1;
+my $sum2;
 
 {
     die "Usage: $0 <file>" unless (@ARGV == 1);
@@ -20,13 +26,36 @@ use Array::Utils qw(:all);
 
     my $fh;
     open($fh, '<', $file);
+
     while (my $line = <$fh>)
     {
         chomp $line;
+        my ($a, $b);
+        ($a, $b) = split(/ +/, $line);
+        push(@left, $a);
+        push(@right, $b);
+        $right_of{$b}++;
     }
     close($fh);
 }
 
+@left = sort(@left);
+@right = sort(@right);
+
+for (my $i = 0; $i <= $#left; $i++)
+{
+    $sum1 += abs($left[$i] - $right[$i]);
+}
+
+print "$sum1\n";
+
+for (my $i = 0; $i <= $#left; $i++)
+{
+    $sum2 += $left[$i] * $right_of{$left[$i]}
+        if ($right_of{$left[$i]});
+}
+
+print "$sum2\n";
 
 
 # Debug function
