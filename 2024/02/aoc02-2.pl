@@ -34,10 +34,13 @@ my $comp = Array::Compare->new;
     close($fh);
 }
 
+# Loop over all reports
 REPORT:
 foreach my $ref (@reports)
 {
     my @rep_orig = @$ref;
+
+    # Try unmodified first (-1) and then remove one element each time
  TRY:
     for (my $try = -1; $try <= $#rep_orig; $try++)
     {
@@ -51,9 +54,9 @@ foreach my $ref (@reports)
             @rep = @rep_orig;
             splice(@rep, $try, 1);
         }
-        # D(\@rep);
         my @sorted = sort { $a <=> $b } @rep;
 
+        # Check ascending
         if ($comp->compare(\@rep, \@sorted))
         {
             for (my $i = 0; $i < $#rep; $i++)
@@ -67,6 +70,8 @@ foreach my $ref (@reports)
         }
 
         my @reversed = reverse(@sorted);
+
+        # Check descending
         if ($comp->compare(\@rep, \@reversed))
         {
             my $err = 0;
