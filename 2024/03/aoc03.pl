@@ -15,7 +15,7 @@ use Array::Compare;
 
 # Global variables
 my $sum;
-
+my $sum2;
 {
     die "Usage: $0 <file>" unless (@ARGV == 1);
     my $file = shift @ARGV;
@@ -25,21 +25,27 @@ my $sum;
     open($fh, '<', $file);
     my $line = <$fh>;
 
-    print $line;
-    while ($line =~ s/don't\(\).*?(do\(\)|$)//gs)
-    {
-    }
-    print $line;
     my @mul = $line =~ m/mul\((\d+,\d+)\)/g;
     foreach my $i (@mul)
     {
         my ($a, $b) = split(/,/, $i);
         $sum += $a * $b;
     }
+
+    while ($line =~ s/don't\(\).*?(do\(\)|$)//gs)
+    {
+    }
+
+    @mul = $line =~ m/mul\((\d+,\d+)\)/g;
+    foreach my $i (@mul)
+    {
+        my ($a, $b) = split(/,/, $i);
+        $sum2 += $a * $b;
+    }
     close($fh);
 }
 
-print "$sum\n";
+print "$sum\n$sum2\n";
 
 
 # Debug function
