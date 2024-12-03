@@ -6,6 +6,7 @@ use strict;
 use warnings;
 no warnings 'recursion';
 use Data::Dumper;
+use feature 'say';
 
 # Other modules
 use List::Util qw (max sum);
@@ -16,6 +17,7 @@ use Array::Compare;
 # Global variables
 my $sum;
 my $sum2;
+
 {
     die "Usage: $0 <file>" unless (@ARGV == 1);
     my $file = shift @ARGV;
@@ -25,27 +27,32 @@ my $sum2;
     open($fh, '<', $file);
     my $line = <$fh>;
 
-    my @mul = $line =~ m/mul\((\d+,\d+)\)/g;
-    foreach my $i (@mul)
-    {
-        my ($a, $b) = split(/,/, $i);
-        $sum += $a * $b;
-    }
+    # Part 1
+    say sumstring($line);
 
+    # Remove stuff between dont and do
     while ($line =~ s/don't\(\).*?(do\(\)|$)//gs)
     {
     }
 
-    @mul = $line =~ m/mul\((\d+,\d+)\)/g;
-    foreach my $i (@mul)
-    {
-        my ($a, $b) = split(/,/, $i);
-        $sum2 += $a * $b;
-    }
+    # Part 2
+    say sumstring($line) ;
     close($fh);
 }
 
-print "$sum\n$sum2\n";
+sub sumstring
+{
+    my $str = shift;
+    my $total = 0;
+
+    my @mul = $str =~ m/mul\((\d+,\d+)\)/g;
+    foreach my $i (@mul)
+    {
+        my ($a, $b) = split(/,/, $i);
+        $total += $a * $b;
+    }
+    return $total;
+}
 
 
 # Debug function
