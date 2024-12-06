@@ -30,30 +30,30 @@ use Array::Compare;
     {
         chomp $line;
 
-        # For part 1
         $line =~ s/([0-9]+)\|([0-9]+)/$2.*$1/;
         push(@ordering, $line);
     }
-    #D(\@ordering);
+
+    # Part 1
  UPDATE:
     while(my $line = <$fh>)
     {
         chomp $line;
         foreach my $order (@ordering)
         {
-            #say "$line $order";
             if ($line =~ /$order/)
             {
+                # Bad updates go to part 2
                 push(@badupdate, $line);
                 next UPDATE;
             }
         }
-        #say "$line correct";
         my @update = split(/,/, $line);
         $sum += $update[$#update / 2];
     }
     say $sum;
 
+    # Part 2
     $sum = 0;
     foreach my $update (@badupdate)
     {
@@ -74,9 +74,7 @@ use Array::Compare;
                 }
             }
             last CHECK unless($error);
-            #say $update;
         }
-        #say $update;
         my @update = split(/,/, $update);
         $sum += $update[$#update / 2];
     }
@@ -90,7 +88,6 @@ sub check_order
     my $order = shift;
     if ($update =~ /$order/)
     {
-        #say "Wrong order: $order, $update";
         return split(/\.\*/, $order);
     }
 }
