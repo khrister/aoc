@@ -14,6 +14,7 @@ use List::MoreUtils qw (first_index any);
 use Array::Utils qw(:all);
 use Array::Compare;
 use Algorithm::Combinatorics qw(variations_with_repetition);
+use Memoize;
 
 # Global variables
 
@@ -29,13 +30,14 @@ use Algorithm::Combinatorics qw(variations_with_repetition);
     chomp @lines;
 
     my $sum;
+    memoize('get_permutations');
 
  LINE:
     foreach my $line (@lines)
     {
         my ($result, $tmp) = split(/: /, $line);
         my @numbers = split(/ /, $tmp);
-        my @combs = variations_with_repetition(['+', '*', '.'], @numbers - 1);
+        my @combs = get_permutations(['+', '*', '.'], @numbers - 1);
         #D(\@combs);
 
         foreach my $comb (@combs)
@@ -57,12 +59,19 @@ use Algorithm::Combinatorics qw(variations_with_repetition);
             if ($res == $result)
             {
                 $sum += $res;
-                say "current $sum";
+                #say "current $sum";
                 next LINE;
             }
         }
     }
     say $sum;
+}
+
+sub get_permutations
+{
+    my $ops = shift;
+    my $number = shift;
+    return variations_with_repetition($ops, $number);
 }
 
 
