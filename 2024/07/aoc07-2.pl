@@ -40,6 +40,7 @@ use Memoize;
         my @combs = get_permutations(['+', '*', '.'], @numbers - 1);
         #D(\@combs);
 
+    COMBINATION:
         foreach my $comb (@combs)
         {
             my @ops = @{$comb};
@@ -62,6 +63,7 @@ use Memoize;
                 #say "current $sum";
                 next LINE;
             }
+            next COMBINATION if ($res > $result);
         }
     }
     say $sum;
